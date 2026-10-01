@@ -51,6 +51,10 @@ for name in curves:
     try:
         p, _ = curve_fit(pl, np.array(sizes, float), yv, p0=[2.0, 0.5, 0.5], bounds=([0, 0.01, 0.0], [50, 3, 1.5]), maxfev=20000)
         print(f"{name:14s}: a = {p[0]:.2f}, b = {p[1]:.2f}, floor c = {p[2]:.3f};  predicted RMSE at n = 1,200: {pl(1200, *p):.3f}; at 12,000: {pl(12000, *p):.3f}; at 120,000: {pl(120000, *p):.3f}")
+        try:
+            pf, _ = curve_fit(lambda nn, a, b: a * nn ** (-b) + 0.54, np.array(sizes, float), yv, p0=[2.0, 0.3], bounds=([0, 0.01], [50, 3]), maxfev=20000)
+            print(f"{'':14s}  with the floor FIXED at the measured noise ceiling 0.54: a = {pf[0]:.2f}, b = {pf[1]:.2f};  predicted RMSE at n = 1,200: {0.54 + pf[0] * 1200 ** -pf[1]:.3f}; at 12,000: {0.54 + pf[0] * 12000 ** -pf[1]:.3f}; at 120,000: {0.54 + pf[0] * 120000 ** -pf[1]:.3f}")
+        except Exception as ex: print(name, "fixed-floor fit failed", ex)
     except Exception as ex: print(name, "fit failed", ex)
 print("noise ceiling check: a single-measurement noise SD of 0.54 pIC50 (Chapter 24) is an RMSE floor of 0.54 for any model")
 
@@ -59,11 +63,12 @@ NTR = 100
 print(f"\n== 2. The same number of training molecules ({NTR}) from few vs many clusters; test = molecules from held-out clusters ==")
 sizes_cl = np.array([(cl == k).sum() for k in range(ncl)])
 print("clusters used   training molecules   test RMSE (SE over 15 draws)")
-for k_cl in [1, 2, 5, 10, 20, 40]:
+for k_cl in [1, 2, 5, 10, 20, 30]:
     e = []
     for rep in range(15):
         r = np.random.default_rng(100 + rep); order = r.permutation(ncl); te_c = order[: ncl // 4]; te = np.flatnonzero(np.isin(cl, te_c))
         cand = [c for c in order[ncl // 4:] if sizes_cl[c] >= max(3, NTR // k_cl // 2)]
+        if len(cand) < k_cl: continue
         for _ in range(200):                                                      # draw clusters until their union holds enough molecules
             tc = list(r.choice(cand, k_cl, replace=False)); pool = np.flatnonzero(np.isin(cl, tc))
             if len(pool) >= NTR: break

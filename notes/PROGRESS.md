@@ -14,21 +14,15 @@ Legend: [x] written + built + math-checked; [ ] pending.
 - [x] index, how-to-use, toc, dependency-graph, learning-trajectory, field-map, research-skills, notation
 
 ## Chapters
-- [x] 1 Expert chain (code/ch01_noise_ceiling.py)
-- [x] 2 Linear algebra (code/ch02_linear_algebra.py)
-- [x] 3 Calculus & optimization (code/ch03_optimization.py)
-- [x] 4 Probability/statistics (code/ch04_statistics.py)
-- [x] 5 Information theory (code/ch05_information.py)
-- [x] 6 Computational thinking (code/ch06_dynamic_programming.py, ch06_training_skeleton.py)
-- [x] 7 Statistical learning (code/ch07_generalization.py)
-- [x] 8 Latent-variable models (code/ch08_latent_variables.py)
-- [x] 9 Backprop (code/ch09_autograd.py)
-- [x] 10 CNNs (code/ch10_cnn_grammar.py)
-- [x] 11 RNN/SSM/long conv (code/ch11_sequence_models.py)
-- [x] 12 Attention (code/ch12_attention.py)
-- [x] 13 Representation learning (code/ch13_representation.py)
-- [x] 14 Generative I (code/ch14_generative.py)
-(next: 15 diffusion, 16 geometric DL, 17 foundation models/scaling, 18 interpretability/eval, then Part V ...)
+All 59 chapters, the front matter, and Appendices A-G exist; `mkdocs build --strict` passes and the MathJax parse check reports 0 errors.
+- Ch 1-31, 33, 43-45, 55-57, 59: written in earlier sessions (see git log).
+- Ch 32 genomic LMs, 34 protein LMs, 35 structure prediction, 36 design, 37 molecular ML, 38 single-cell FMs, 39 perturbation/virtual cell,
+  40 multimodal, 41 genotype-phenotype, 42 evolutionary modeling, 47 scaling and data economics, 48 mechanistic interpretability,
+  49 competing paradigms, 50-52 open-problem atlases, 53 brains, 54 AI scientists, 58 open-ended case studies: written in this session
+  (each with a tested script in code/ and its output pasted into the chapter).
+- Ch 46 experimental design: text complete; the Section 4 table is filled from the final rerun of code/ch46_design.py.
+- Appendices C (code companion), D (data and tools), E (timeline), F (reading lists) written.
+- code/run_all.py and code/requirements-code.txt added.
 
 ## Chapter template actually used (keep consistent)
 `!!! abstract "Chapter at a glance"` (Motivation / Prerequisites / You will be able to), numbered sections 'N.M', derivations inline,
@@ -43,7 +37,7 @@ mkdocs build 2>&1 | grep -iE "ERROR|snippet" ; MJ_NODE_MODULES=<scratchpad>/tool
 Python deps installed in sandbox: numpy scipy torch scikit-learn mkdocs-material playwright.
 
 ## Git/push status
-Local commits only; `git push` and MCP writes return 403 (GitHub App lacks write access to namknnguyen/ai-for-biology-book).
+Local commits only; `git push` and MCP writes return 403 (GitHub App lacks write access to namknnguyen/ai-for-biology-book). Repeatedly retried at milestones; still 403.
 Retry push at milestones. If still blocked at the end: tell user to install/authorize Claude GitHub App with write access, then push branch
 claude/compassionate-archimedes-d1r2q8 and set Settings > Pages > Source: GitHub Actions.
 

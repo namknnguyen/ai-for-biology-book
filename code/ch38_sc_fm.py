@@ -66,13 +66,14 @@ def evaluate(Zref, Znew, name):
     Zall = np.vstack([Zref, Znew]); lab = np.r_[kcorp[ref_idx], knew]; study_lab = np.r_[np.zeros(len(Zref)), np.ones(len(Znew))]; m = lab != 11
     asw_b = np.mean([abs(silhouette_score(Zall[m & (lab == t)], study_lab[m & (lab == t)], metric="cosine", sample_size=1000, random_state=0)) for t in [3, 4, 5, 6, 7]])
     print(f"{name:46s}   {acc:6.3f}               {auc:6.3f}                  {asw_type:6.3f}               {asw_b:6.3f}")
-print("\nmethod                                         label transfer accuracy   novel-type detection AUROC   cell-type silhouette   study separation within type (0 = mixed)")
-def lognorm(Y): return np.log1p(Y / Y.sum(1, keepdims=True) * 1e4)
-pool = np.vstack([Ycorp[ref_idx], Ynew])                                                                              # PCA and VAE are fit on reference + new cells
-hv = np.argsort(-lognorm(pool).var(0))[:300]; Zp = PCA(30, random_state=0).fit_transform(lognorm(pool)[:, hv]); evaluate(Zp[:len(ref_idx)], Zp[len(ref_idx):], "PCA, 300 variable genes, 30 PCs")
-Zp2 = PCA(30, random_state=0).fit_transform(lognorm(pool)); evaluate(Zp2[:len(ref_idx)], Zp2[len(ref_idx):], "PCA, all genes, 30 PCs")
-bats = np.r_[np.zeros(len(ref_idx), int), np.ones(len(Ynew), int)]; Zv = ch30.fit_vae(pool, bats, False, epochs=60); evaluate(Zv[:len(ref_idx)], Zv[len(ref_idx):], "NB-VAE (no batch covariate), fit on reference + new")
-for n_pre, steps in [(2000, 400), (19800, 800)]:
-    sel = rng.choice(len(Ycorp), n_pre, replace=False); net, med, ls = pretrain(Ycorp[sel], steps)
-    Zr = fm_embed(net, med, Ycorp[ref_idx]); Zn = fm_embed(net, med, Ynew); evaluate(Zr, Zn, f"mini-FM zero-shot, {n_pre:,} pretraining cells, {steps} steps")
-torch.manual_seed(1); rnd = MiniFM().eval(); Zr = fm_embed(rnd, np.ones(G), Ycorp[ref_idx]); Zn = fm_embed(rnd, np.ones(G), Ynew); evaluate(Zr, Zn, "mini-FM architecture, random weights (no pretraining)")
+if __name__ == "__main__":
+    print("\nmethod                                         label transfer accuracy   novel-type detection AUROC   cell-type silhouette   study separation within type (0 = mixed)")
+    def lognorm(Y): return np.log1p(Y / Y.sum(1, keepdims=True) * 1e4)
+    pool = np.vstack([Ycorp[ref_idx], Ynew])                                                                              # PCA and VAE are fit on reference + new cells
+    hv = np.argsort(-lognorm(pool).var(0))[:300]; Zp = PCA(30, random_state=0).fit_transform(lognorm(pool)[:, hv]); evaluate(Zp[:len(ref_idx)], Zp[len(ref_idx):], "PCA, 300 variable genes, 30 PCs")
+    Zp2 = PCA(30, random_state=0).fit_transform(lognorm(pool)); evaluate(Zp2[:len(ref_idx)], Zp2[len(ref_idx):], "PCA, all genes, 30 PCs")
+    bats = np.r_[np.zeros(len(ref_idx), int), np.ones(len(Ynew), int)]; Zv = ch30.fit_vae(pool, bats, False, epochs=60); evaluate(Zv[:len(ref_idx)], Zv[len(ref_idx):], "NB-VAE (no batch covariate), fit on reference + new")
+    for n_pre, steps in [(2000, 400), (19800, 800)]:
+        sel = rng.choice(len(Ycorp), n_pre, replace=False); net, med, ls = pretrain(Ycorp[sel], steps)
+        Zr = fm_embed(net, med, Ycorp[ref_idx]); Zn = fm_embed(net, med, Ynew); evaluate(Zr, Zn, f"mini-FM zero-shot, {n_pre:,} pretraining cells, {steps} steps")
+    torch.manual_seed(1); rnd = MiniFM().eval(); Zr = fm_embed(rnd, np.ones(G), Ycorp[ref_idx]); Zn = fm_embed(rnd, np.ones(G), Ynew); evaluate(Zr, Zn, "mini-FM architecture, random weights (no pretraining)")

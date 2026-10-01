@@ -1,0 +1,12 @@
+# Packages used by the scripts in code/ (versions the book's outputs were generated with; newer versions should work).
+# PyTorch: install the CPU build, e.g.  pip install torch --index-url https://download.pytorch.org/whl/cpu
+numpy>=2.0
+scipy>=1.11
+pandas>=2.0
+scikit-learn>=1.4
+torch>=2.2
+rdkit>=2023.9          # Chapters 24, 37, 47
+biopython>=1.83        # Chapters 27-29, 32, 33, 35
+tokenizers>=0.15       # Chapter 28 (byte-pair encoding)
+pyjaspar>=3.0          # Chapter 29 (JASPAR motifs)
+ViennaRNA>=2.6         # Chapter 33 (RNA folding)
