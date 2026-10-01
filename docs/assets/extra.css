@@ -1,0 +1,94 @@
+/* ------------------------------------------------------------------
+   Layout and typography tuned for long-form technical reading
+------------------------------------------------------------------- */
+.md-grid { max-width: 1480px; }
+.md-typeset { font-size: 0.82rem; line-height: 1.72; }
+.md-typeset h1 { font-weight: 700; letter-spacing: -0.01em; }
+.md-typeset h2 { margin-top: 2.2em; border-bottom: 1px solid var(--md-default-fg-color--lightest); padding-bottom: 0.2em; }
+.md-typeset h3 { margin-top: 1.8em; }
+.md-typeset table:not([class]) { font-size: 0.74rem; display: table; width: 100%; }
+.md-typeset table:not([class]) th { background: var(--md-default-fg-color--lightest); }
+.md-typeset .arithmatex { overflow-x: auto; overflow-y: hidden; }
+.md-typeset blockquote { border-left: 0.2rem solid var(--md-accent-fg-color); }
+.md-nav__title { font-weight: 700; }
+.md-nav--primary .md-nav__item--section > .md-nav__link { font-weight: 700; color: var(--md-primary-fg-color); }
+
+/* ------------------------------------------------------------------
+   Custom admonitions
+   notebook  = Researcher's Notebook
+   rhyme     = Structural rhyme (shared mathematics across fields)
+   openproblem, bio, math, takeaways, lens, paper
+------------------------------------------------------------------- */
+:root {
+  --md-admonition-icon--notebook: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>');
+  --md-admonition-icon--rhyme: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 6v3l4-4-4-4v3a8 8 0 0 0-8 8c0 1.57.46 3.03 1.24 4.26L6.7 14.8A5.87 5.87 0 0 1 6 12c0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3a8 8 0 0 0 8-8c0-1.57-.46-3.03-1.24-4.26z"/></svg>');
+  --md-admonition-icon--openproblem: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>');
+  --md-admonition-icon--bio: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2v2h1v6.17L3.2 18.6A2 2 0 0 0 5 22h14a2 2 0 0 0 1.8-3.4L16 10.17V4h1V2H7zm3 2h4v6.7l.3.5L17.4 16H6.6l3.1-4.8.3-.5V4z"/></svg>');
+  --md-admonition-icon--math: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z"/></svg>');
+  --md-admonition-icon--takeaways: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+  --md-admonition-icon--lens: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+  --md-admonition-icon--paper: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>');
+}
+
+.md-typeset .admonition.notebook, .md-typeset details.notebook { border-color: #00897b; }
+.md-typeset .notebook > .admonition-title, .md-typeset .notebook > summary { background-color: rgba(0,137,123,.12); }
+.md-typeset .notebook > .admonition-title::before, .md-typeset .notebook > summary::before {
+  background-color: #00897b; -webkit-mask-image: var(--md-admonition-icon--notebook); mask-image: var(--md-admonition-icon--notebook); }
+
+.md-typeset .admonition.rhyme, .md-typeset details.rhyme { border-color: #8e24aa; }
+.md-typeset .rhyme > .admonition-title, .md-typeset .rhyme > summary { background-color: rgba(142,36,170,.10); }
+.md-typeset .rhyme > .admonition-title::before, .md-typeset .rhyme > summary::before {
+  background-color: #8e24aa; -webkit-mask-image: var(--md-admonition-icon--rhyme); mask-image: var(--md-admonition-icon--rhyme); }
+
+.md-typeset .admonition.openproblem, .md-typeset details.openproblem { border-color: #e65100; }
+.md-typeset .openproblem > .admonition-title, .md-typeset .openproblem > summary { background-color: rgba(230,81,0,.10); }
+.md-typeset .openproblem > .admonition-title::before, .md-typeset .openproblem > summary::before {
+  background-color: #e65100; -webkit-mask-image: var(--md-admonition-icon--openproblem); mask-image: var(--md-admonition-icon--openproblem); }
+
+.md-typeset .admonition.bio, .md-typeset details.bio { border-color: #43a047; }
+.md-typeset .bio > .admonition-title, .md-typeset .bio > summary { background-color: rgba(67,160,71,.10); }
+.md-typeset .bio > .admonition-title::before, .md-typeset .bio > summary::before {
+  background-color: #43a047; -webkit-mask-image: var(--md-admonition-icon--bio); mask-image: var(--md-admonition-icon--bio); }
+
+.md-typeset .admonition.math, .md-typeset details.math { border-color: #546e7a; }
+.md-typeset .math > .admonition-title, .md-typeset .math > summary { background-color: rgba(84,110,122,.10); }
+.md-typeset .math > .admonition-title::before, .md-typeset .math > summary::before {
+  background-color: #546e7a; -webkit-mask-image: var(--md-admonition-icon--math); mask-image: var(--md-admonition-icon--math); }
+
+.md-typeset .admonition.takeaways, .md-typeset details.takeaways { border-color: #1e88e5; }
+.md-typeset .takeaways > .admonition-title, .md-typeset .takeaways > summary { background-color: rgba(30,136,229,.10); }
+.md-typeset .takeaways > .admonition-title::before, .md-typeset .takeaways > summary::before {
+  background-color: #1e88e5; -webkit-mask-image: var(--md-admonition-icon--takeaways); mask-image: var(--md-admonition-icon--takeaways); }
+
+.md-typeset .admonition.lens, .md-typeset details.lens { border-color: #f9a825; }
+.md-typeset .lens > .admonition-title, .md-typeset .lens > summary { background-color: rgba(249,168,37,.12); }
+.md-typeset .lens > .admonition-title::before, .md-typeset .lens > summary::before {
+  background-color: #f9a825; -webkit-mask-image: var(--md-admonition-icon--lens); mask-image: var(--md-admonition-icon--lens); }
+
+.md-typeset .admonition.paper, .md-typeset details.paper { border-color: #6d4c41; }
+.md-typeset .paper > .admonition-title, .md-typeset .paper > summary { background-color: rgba(109,76,65,.10); }
+.md-typeset .paper > .admonition-title::before, .md-typeset .paper > summary::before {
+  background-color: #6d4c41; -webkit-mask-image: var(--md-admonition-icon--paper); mask-image: var(--md-admonition-icon--paper); }
+
+/* ------------------------------------------------------------------
+   Evidence-grade badges: [[E]] [[S]] [[P]] [[H]] [[X]]
+------------------------------------------------------------------- */
+.ev { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+      padding: 0.05em 0.5em; border-radius: 0.7em; vertical-align: 0.1em; white-space: nowrap; color: #fff; }
+.ev-E { background: #2e7d32; }
+.ev-S { background: #1565c0; }
+.ev-P { background: #ef6c00; }
+.ev-H { background: #8e24aa; }
+.ev-X { background: #c62828; }
+
+/* Compact "paper dissection" definition lists */
+.md-typeset .paper dl dt { font-weight: 700; margin-top: .6em; }
+.md-typeset .paper dl dd { margin-left: 1.2em; }
+
+/* Mermaid readability */
+.mermaid { text-align: center; }
+
+@media print {
+  .md-typeset { font-size: 10.5pt; }
+  .md-header, .md-sidebar, .md-footer { display: none; }
+}

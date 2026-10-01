@@ -1,0 +1,184 @@
+site_name: "AI for Biology: From First Principles to the Research Frontier"
+site_description: >-
+  A research-training textbook that takes a beginner in machine learning for biology to an independent
+  researcher: foundations, deep learning, biology for modeling, biological foundation models,
+  research methodology, open problems, and systematic idea generation.
+site_author: "AI for Biology Book"
+site_url: https://namknnguyen.github.io/ai-for-biology-book/
+repo_url: https://github.com/namknnguyen/ai-for-biology-book
+repo_name: namknnguyen/ai-for-biology-book
+edit_uri: ""
+copyright: "Text and code released for study and reuse; verify claims against primary sources before citing."
+
+docs_dir: docs
+site_dir: site
+use_directory_urls: true
+
+theme:
+  name: material
+  language: en
+  font:
+    text: Source Serif 4
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.footnote.tooltips
+
+plugins:
+  - search
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra_css:
+  - assets/extra.css
+
+extra_javascript:
+  - assets/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - assets/extra.js
+
+nav:
+  - Home: index.md
+  - Front Matter:
+    - How to Use This Book: front/how-to-use.md
+    - Complete Table of Contents: front/toc.md
+    - Dependency Graph: front/dependency-graph.md
+    - Learning Trajectory: front/learning-trajectory.md
+    - Map of the Fields: front/field-map.md
+    - Research Skills: front/research-skills.md
+    - Notation and Conventions: front/notation.md
+  - "Part I — Orientation":
+    - "1. The Anatomy of a Research Problem": chapters/ch01-expert-chain.md
+  - "Part II — Foundations":
+    - "2. Linear Algebra": chapters/ch02-linear-algebra.md
+    - "3. Calculus and Optimization": chapters/ch03-calculus-optimization.md
+    - "4. Probability, Statistics, Bayes": chapters/ch04-probability-statistics.md
+    - "5. Information Theory": chapters/ch05-information-theory.md
+    - "6. Computational Thinking": chapters/ch06-computational-thinking.md
+  - "Part III — Core Machine Learning":
+    - "7. Statistical Learning": chapters/ch07-statistical-learning.md
+    - "8. Latent-Variable Models": chapters/ch08-latent-variable-models.md
+  - "Part IV — Deep Learning":
+    - "9. Neural Networks and Backpropagation": chapters/ch09-backpropagation.md
+    - "10. Convolutional Models": chapters/ch10-convolutional-models.md
+    - "11. Recurrent, State-Space, Long-Conv": chapters/ch11-sequence-models-ssm.md
+    - "12. Attention and the Transformer": chapters/ch12-attention-transformer.md
+    - "13. Representation Learning": chapters/ch13-representation-learning.md
+    - "14. Generative Models I": chapters/ch14-generative-models-1.md
+    - "15. Generative Models II: Diffusion": chapters/ch15-diffusion-flow-matching.md
+    - "16. Geometric Deep Learning": chapters/ch16-geometric-deep-learning.md
+    - "17. Foundation Models and Scaling": chapters/ch17-foundation-models-scaling.md
+    - "18. Interpretability and Evaluation": chapters/ch18-interpretability-evaluation.md
+  - "Part V — Biology for Modeling":
+    - "19. The Cell as Information System": chapters/ch19-cell-information-system.md
+    - "20. Genomes, Mutation, Variation": chapters/ch20-genomes-variation.md
+    - "21. Population Genetics and Evolution": chapters/ch21-population-genetics-evolution.md
+    - "22. Gene Regulation": chapters/ch22-gene-regulation.md
+    - "23. Proteins": chapters/ch23-proteins.md
+    - "24. Molecules and Drug Chemistry": chapters/ch24-molecules-drug-discovery.md
+    - "25. Single-Cell, Spatial, Perturbation": chapters/ch25-single-cell-spatial-perturbation.md
+    - "26. Statistical Genetics": chapters/ch26-statistical-genetics.md
+  - "Part VI — Computational Biology":
+    - "27. Sequences and Alignment": chapters/ch27-sequences-alignment.md
+    - "28. Representing Biological Data": chapters/ch28-representing-biological-data.md
+    - "29. Classical Models": chapters/ch29-classical-models.md
+    - "30. Single-Cell Methods": chapters/ch30-single-cell-methods.md
+  - "Part VII — Biological Foundation Models":
+    - "31. Sequence-to-Function Models": chapters/ch31-sequence-to-function.md
+    - "32. Genomic Language Models": chapters/ch32-genomic-language-models.md
+    - "33. RNA, Splicing, Translation": chapters/ch33-rna-splicing-translation.md
+    - "34. Protein Language Models": chapters/ch34-protein-language-models.md
+    - "35. Structure Prediction": chapters/ch35-structure-prediction.md
+    - "36. Protein and Biomolecular Design": chapters/ch36-protein-design.md
+    - "37. Molecular ML and Drug Discovery": chapters/ch37-molecular-ml-drug-discovery.md
+    - "38. Single-Cell Foundation Models": chapters/ch38-single-cell-foundation-models.md
+    - "39. Perturbation and the Virtual Cell": chapters/ch39-perturbation-virtual-cell.md
+    - "40. Multimodal and Multi-Scale": chapters/ch40-multimodal-multiscale.md
+    - "41. Genotype to Phenotype": chapters/ch41-genotype-phenotype.md
+    - "42. Evolutionary Modeling": chapters/ch42-evolutionary-modeling.md
+  - "Part VIII — Research Methodology":
+    - "43. Benchmarks and Evaluation": chapters/ch43-benchmarks-evaluation.md
+    - "44. Causal Inference": chapters/ch44-causal-inference.md
+    - "45. Distribution Shift and Confounding": chapters/ch45-distribution-shift.md
+    - "46. Experimental Design and Validation": chapters/ch46-experimental-design.md
+    - "47. Scaling, Compute, Data": chapters/ch47-scaling-compute-data.md
+    - "48. Mechanistic Interpretability": chapters/ch48-mechanistic-interpretability.md
+  - "Part IX — The Frontier":
+    - "49. Competing Paradigms": chapters/ch49-competing-paradigms.md
+    - "50. Open Problems: Genomes": chapters/ch50-open-problems-genomes.md
+    - "51. Open Problems: Cells": chapters/ch51-open-problems-cells.md
+    - "52. Open Problems: Proteins, Molecules": chapters/ch52-open-problems-proteins.md
+    - "53. Brains and Neural Systems": chapters/ch53-open-problems-brains.md
+    - "54. AI Scientists": chapters/ch54-ai-scientists.md
+  - "Part X — Independent Research":
+    - "55. Generating Ideas: Ten Attacks": chapters/ch55-idea-generation.md
+    - "56. Evaluating Ideas": chapters/ch56-evaluating-ideas.md
+    - "57. Reading and Critiquing Papers": chapters/ch57-reading-papers.md
+    - "58. Reasoning Without Answers": chapters/ch58-open-ended-case-studies.md
+    - "59. From Idea to Publication": chapters/ch59-from-idea-to-publication.md
+  - Appendices:
+    - "A. Mathematical Reference": appendices/a-math-reference.md
+    - "B. Glossary": appendices/b-glossary.md
+    - "C. Code Companion": appendices/c-code-companion.md
+    - "D. Data and Tools": appendices/d-data-tools.md
+    - "E. Timeline of the Field": appendices/e-timeline.md
+    - "F. Annotated Reading Lists": appendices/f-reading-lists.md
+    - "G. Research Templates": appendices/g-templates.md
