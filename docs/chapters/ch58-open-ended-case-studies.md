@@ -36,7 +36,7 @@ Each case has the same skeleton, so that you can reuse it.
 ## 58.1 Case 1: Why do zero-shot single-cell foundation models lose to PCA?
 
 !!! example "Worked Research Example 58.1: Single-cell foundation models and the simple baseline"
-    **Situation.** Zero-shot embeddings from several single-cell foundation models give worse cell-type separation and batch mixing than PCA on highly variable genes, scVI, or Harmony on several benchmarks (Kedzierska et al. 2025; Chapter 38). In a miniature simulation (Chapter 38), a small rank-encoding transformer pretrained on 19,800 cells did not match PCA either. Teams propose bigger models and more data. You are asked what to do.
+    **Situation.** Zero-shot embeddings from several single-cell foundation models give worse cell-type separation and batch mixing than PCA on highly variable genes, scVI, or Harmony on several benchmarks (Kedzierska et al. 2025; Chapter 38). In a miniature simulation (Chapter 38), a small rank-encoding transformer pretrained on 19,800 cells by masked-gene prediction did not match PCA either (label transfer 0.49 against 0.94–0.96), but the same model with a contrastive depth-invariance term added reached 0.94: the objective, not the data size (0.51 to 0.49 for ten times more cells), made the difference, in one seed of a favorable simulation. Teams propose bigger models and more data. You are asked what to do.
 
     **L1 Problem.** *Measure*: label-transfer accuracy, novel-type detection, batch mixing of a zero-shot embedding relative to the best simple baseline, on held-out studies. *Question*: which factor limits the foundation model: (i) its pretraining data and scale, (ii) its objective, (iii) its input encoding, (iv) how it is evaluated?
 
@@ -82,6 +82,8 @@ Each case has the same skeleton, so that you can reuse it.
     | All conditions at PCA's level with the ceiling reached | H4: the benchmark cannot discriminate; build harder tasks | C1 |
     | Gains from depth-adversarial training | H5 | C2 |
     | Mixed: no single factor, interactions | Report the interactions; no single-factor claim | C1 |
+
+    **Pilot evidence.** The simulation above updates the prior toward H2 (objective) before any real data are used, but it is a single seed in a world designed with a nuisance (depth) that the augmentation targets; the factorial study below is what would test H2 on real atlases.
 
     **Expected information gain.** The five-way prior has entropy 2.2 bits. A single yes/no experiment that tests H2 with 80% reliability earns only about 0.24 bits; the factorial design, whose outcomes can separate all five, can earn up to 2.2 bits (realistically 1–1.5 bits, because the predictions of neighboring hypotheses overlap) for weeks of work, whereas "train a 10× bigger model and see" earns little, since most hypotheses predict that it will not help. Cheap controlled experiments beat expensive uncontrolled ones.
 

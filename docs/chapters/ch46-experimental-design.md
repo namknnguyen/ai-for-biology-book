@@ -117,9 +117,18 @@ When experiments are run in rounds, the model can choose the next batch using wh
 
 **Experiment 4.** A rugged pairwise-epistatic landscape over 12-position, 4-letter sequences (global saturating readout), a pool of 100,000 candidates, 40 random starting measurements, and 8 rounds of 20 new measurements chosen by (a) random selection, (b) greedy ranking by a ridge surrogate on single-position and pair features, (c) bootstrap Thompson sampling (each batch member chosen from a bootstrap-refit surrogate); 20 runs each:
 
-@@TABLE4@@
+| Strategy | Best fitness found after rounds 0 / 2 / 4 / 8 (fraction of the best in the pool) | Probability of reaching the top 0.1% of the pool (20 runs) |
+|---|---|---|
+| Random selection | 0.977 / 0.985 / 0.991 / 0.999 | 0.20 |
+| Greedy ranking by the ridge surrogate | 0.977 / 0.999 / 1.000 / 1.000 | 0.95 |
+| Bootstrap Thompson sampling | 0.977 / 0.999 / 1.000 / 1.000 | 1.00 |
 
-@@TEXT4@@
+**Reading Experiment 4.**
+
+1. **The fitness fraction hides the difference.** Because the readout saturates, even random selection reaches 0.999 of the pool's best fitness after the 8 rounds (200 measurements in total, including the 40 starting points). The discriminating metric is the probability of reaching the **top 0.1%** of the pool: 0.20 for random selection (as it should be: 200 random evaluations succeed with probability $1-0.999^{200}=0.18$), **0.95** for greedy ranking by the surrogate, and **1.00** for bootstrap Thompson sampling.
+2. **A surrogate-guided search is five times as likely to find a top-0.1% sequence with the same 200 measurements.** The advantage appears already after two rounds (0.999 against 0.985).
+3. **Thompson sampling is not distinguishable from greedy ranking here.** With 20 runs per strategy the binomial standard error of a probability near 0.95 is about 0.05, so 0.95 against 1.00 is within noise; the practical difference between the strategies appears when the surrogate is less accurate or batches must be diverse (Thompson draws are diverse by construction).
+4. **Why it works so well, and why it may not transfer.** The surrogate's feature set (single positions plus 300 of the possible pair terms) contains most of the structure of the true landscape (pairwise epistasis); the pool is a fixed set of 100,000 random sequences, so the search is a *retrieval* within a known set rather than an exploration of an unbounded space; and the landscape's global nonlinearity is monotone. Chapter 36 shows what happens when the surrogate is misspecified (an additive surrogate wasted four fitness units), when data are local (a trust-region phase transition at small $\beta$), and when diversity collapses (unique designs fell to 17–26% at near-argmax selection).
 
 !!! lens "Research lens: exploration, exploitation, and model exploitation"
     **Assumption it makes explicit:** the surrogate is accurate where the acquisition function sends you. **Failure modes:** (i) *model exploitation*: optimizing a learned predictor finds inputs where the predictor is wrong (Chapter 36); trust regions, KL penalties, ensembles, and pessimism help. (ii) *Batch collapse*: a greedy batch contains near-duplicates; use diversity. (iii) *Distribution shift between rounds* (Chapter 45): early data come from a different region than late data. (iv) *Noise*: expected improvement assumes a noise model; a screening assay with 30% noise misleads greedy selection.
@@ -144,7 +153,50 @@ When experiments are run in rounds, the model can choose the next batch using wh
 ```
 
 ```text
-@@OUTPUT@@
+== 1. Learning a response map from k measured perturbations (features d = 12, clustered and imbalanced; 600 candidate perturbations, 500 genes) ==
+budget k   method                       held-out R2 (all)   held-out R2 on the rarest cluster (2% of perturbations)
+    12     random                          0.823                 0.618
+    12     D-optimal (greedy)              0.894                 0.849
+    12     diversity (farthest point)      0.883                 0.839
+    24     random                          0.890                 0.686
+    24     D-optimal (greedy)              0.923                 0.898
+    24     diversity (farthest point)      0.917                 0.887
+    48     random                          0.924                 0.843
+    48     D-optimal (greedy)              0.933                 0.909
+    48     diversity (farthest point)      0.931                 0.905
+    96     random                          0.935                 0.902
+    96     D-optimal (greedy)              0.937                 0.906
+    96     diversity (farthest point)      0.937                 0.917
+
+== 2. A fixed budget of 200,000 cells: many perturbations with few cells, or few with many? (d = 12 features, per-gene noise SD 1.0 per cell) ==
+perturbations P   cells each n   error in predicting 2,000 held-out perturbations (RMSE of response, mean over genes)
+          20         10000         0.180
+          50          4000         0.039
+         200          1000         0.011
+        1000           200         0.008
+        4000            50         0.008
+       10000            20         0.008
+
+== 3. Identifying two motif effects (true +1.0 and -0.8) whose occurrences are perfectly collinear in reference sequences ==
+experiment design (n measurements)                         n     mean |error| in effect A    in effect B    (noise SD 0.3)
+observational reference loci                                 20          0.896               0.904
+observational reference loci                                100          0.899               0.901
+observational reference loci                                400          0.900               0.900
+random mutagenesis (each motif disrupted with prob 0.15)     20          0.242               0.245
+random mutagenesis (each motif disrupted with prob 0.15)    100          0.070               0.071
+random mutagenesis (each motif disrupted with prob 0.15)    400          0.033               0.035
+targeted single-motif deletions (half A, half B)             20          0.073               0.078
+targeted single-motif deletions (half A, half B)            100          0.034               0.034
+targeted single-motif deletions (half A, half B)            400          0.017               0.017
+targeted: A, B, both, neither (balanced factorial)           20          0.090               0.095
+targeted: A, B, both, neither (balanced factorial)          100          0.039               0.037
+targeted: A, B, both, neither (balanced factorial)          400          0.021               0.020
+
+== 4. Design-build-test-learn: 12-position, 4-letter sequences, pairwise-epistatic landscape; 40 random starts, 8 rounds of batches of 20 ==
+strategy                 best fitness found after rounds 0, 2, 4, 8 (as a fraction of the best in a 100,000 pool)      P(reach top 0.1% of the pool)  [200 random evaluations would succeed with probability 0.18]
+random                   0.977  0.985  0.991  0.999                                                  0.20
+greedy (ridge)           0.977  0.999  1.000  1.000                                                  0.95
+bootstrap Thompson       0.977  0.999  1.000  1.000                                                  1.00
 ```
 
 ---
@@ -217,7 +269,7 @@ When experiments are run in rounds, the model can choose the next batch using wh
     4. **Breadth versus depth** depends on the goal: to learn a low-dimensional response map, many perturbations at modest depth (error 0.008 for 1,000–10,000 perturbations versus 0.18 for 20); to characterize each perturbation, depth ($1/\sqrt n$).
     5. **Collinear effects need designed variation**: observational error stayed at 0.90 for any $n$; random mutagenesis reached 0.07 at $n=100$; targeted single-motif deletions reached the same at $n=20$.
     6. **Randomize, block, balance, and control** (non-targeting guides, bridge samples); decide the replication unit and power in advance.
-    7. **Closed-loop designs** (active learning, Bayesian optimization) find optima with far fewer measurements than random screening, but fail by model exploitation, batch collapse, and shift unless trust regions and diversity are used.
+    7. **Closed-loop designs** (active learning, Bayesian optimization) find optima with far fewer measurements than random screening (with 200 measurements, the probability of reaching the top 0.1% of a 100,000-sequence pool was 0.95 for greedy surrogate ranking and 1.00 for bootstrap Thompson sampling, against 0.20 for random selection), but fail by model exploitation, batch collapse, and shift unless trust regions and diversity are used (Chapter 36).
     8. Choose designs by **expected information gain per cost**, estimated from a pilot.
 
 ---

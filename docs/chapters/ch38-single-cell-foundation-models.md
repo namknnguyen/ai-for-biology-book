@@ -1,7 +1,7 @@
 # Chapter 38. Single-Cell Foundation Models
 
 !!! abstract "Chapter at a glance"
-    **Motivation.** Single-cell atlases now contain more than a hundred million cells, and the success of language models trained on text suggested a path: pretrain a transformer on cells, with genes as tokens, and obtain embeddings, annotations, perturbation predictions, and regulatory networks from one model. Between 2022 and 2025 many such models appeared (scBERT, Geneformer, scGPT, scFoundation, UCE, TranscriptFormer, State, Cell2Sentence). The first independent zero-shot evaluations found that several of them lost to simple baselines (highly variable genes with PCA, scVI, Harmony) on cell-type separation and batch integration, which turned a promise into a research question: *what, exactly, does masked-gene pretraining on expression learn, and when does it beat the data's own principal components?* This chapter defines the tokenizations and objectives, derives what masked-gene prediction can and cannot be expected to learn, and runs a controlled miniature on simulated atlases with known cell types, studies, depth differences, and a novel cell type held out of pretraining. The experiment compares the foundation-model embedding with PCA and a variational autoencoder, separates three kinds of metrics (label transfer, novel-type detection, study mixing), and tests whether a contrastive depth-invariance objective changes the result. It then reviews the evidence, with grades, and gives practical guidance.
+    **Motivation.** Single-cell atlases now contain more than a hundred million cells, and the success of language models trained on text suggested a path: pretrain a transformer on cells, with genes as tokens, and obtain embeddings, annotations, perturbation predictions, and regulatory networks from one model. Between 2022 and 2025 many such models appeared (scBERT, Geneformer, scGPT, scFoundation, UCE, TranscriptFormer, State, Cell2Sentence). The first independent zero-shot evaluations found that several of them lost to simple baselines (highly variable genes with PCA, scVI, Harmony) on cell-type separation and batch integration, which turned a promise into a research question: *what, exactly, does masked-gene pretraining on expression learn, and when does it beat the data's own principal components?* This chapter defines the tokenizations and objectives, derives what masked-gene prediction can and cannot be expected to learn, and runs a controlled miniature on simulated atlases with known cell types, studies, depth differences, and a novel cell type held out of pretraining. The experiment compares the foundation-model embedding with PCA and a variational autoencoder, separates three kinds of metrics (label transfer, novel-type detection, study mixing), and tests whether a contrastive depth-invariance objective changes the result: under masked-gene pretraining the miniature learned no cell types (label transfer 0.49, the same as random weights; PCA 0.94–0.96), and a contrastive term raised it to 0.94, a larger effect than ten times more data. It then reviews the evidence, with grades, and gives practical guidance.
     **Prerequisites.** Chapters 8, 12, 13, 17, 25, 30, 43, 45, 46.
     **You will be able to:** (1) describe rank-value, binned-value, continuous-value, and text tokenizations of expression and what each discards; (2) say what masked-gene pretraining learns at the optimum; (3) evaluate an embedding with a *paired* set of metrics that no uninformative embedding can win; (4) interpret the zero-shot literature; (5) decide when to use a foundation model, a classical baseline, or both; (6) design the pretraining study that separates scale, objective, and tokenization.
 
@@ -53,7 +53,15 @@
 ```
 
 ```text
-@@OUTPUT@@
+corpus: 19,800 cells, 6 studies, 11 cell types, mean UMI 3152;  new study: 2,400 cells, mean UMI 1261, types [3, 4, 5, 6, 7, 11] (type 11 never seen in the corpus)
+
+method                                         label transfer accuracy   novel-type detection AUROC   cell-type silhouette   study separation within type (0 = mixed)
+PCA, 300 variable genes, 30 PCs                   0.942                1.000                   0.290                0.457
+PCA, all genes, 30 PCs                            0.962                0.999                   0.368                0.523
+NB-VAE (no batch covariate), fit on reference + new    0.581                0.883                   0.606                0.550
+mini-FM zero-shot, 2,000 pretraining cells, 400 steps    0.505                0.995                   0.093                0.047
+mini-FM zero-shot, 19,800 pretraining cells, 800 steps    0.490                0.982                   0.040                0.035
+mini-FM architecture, random weights (no pretraining)    0.498                0.602                   0.004                0.064
 ```
 
 **Reading the results.**
@@ -63,7 +71,24 @@
 3. **What pretraining did change**: novel-type detection rose from 0.60 (random weights) to 0.98–0.995, i.e., pretraining taught the embedding *which cells look like the pretraining corpus*, which is sufficient to flag a new type but not to separate known ones.
 4. **Mixing metrics reward uninformative embeddings.** The mini-FM mixes studies better than any other method (study separation 0.035–0.047, against 0.46–0.52 for PCA), but its cell-type silhouette is near zero: an embedding that has discarded most structure mixes studies trivially. *Batch integration scores must always be reported together with a metric that an uninformative embedding fails* (label transfer, silhouette on type).
 
-@@CONTRAST@@
+**Does the objective matter? A second experiment.** The same architecture, the same 19,800 pretraining cells, and the same evaluation, with a **contrastive** term: two views of each cell, made by binomial thinning of the counts (each view keeps a random 30–100% of the UMIs), are embedded together and apart from the other cells in the batch (InfoNCE, temperature 0.2), either alone or added to the masked-gene loss.
+
+```python
+--8<-- "code/ch38b_contrastive.py"
+```
+
+```text
+corpus: 19,800 cells, 6 studies, 11 cell types, mean UMI 3152;  new study: 2,400 cells, mean UMI 1261, types [3, 4, 5, 6, 7, 11] (type 11 never seen in the corpus)
+method                                         label transfer accuracy   novel-type detection AUROC   cell-type silhouette   study separation within type (0 = mixed)
+mini-FM, masked-gene loss only (from ch38_sc_fm.py)    0.479                0.992                   0.053                0.049
+mini-FM, masked-gene + contrastive (depth-invariance)    0.935                0.998                   0.343                0.112
+mini-FM, contrastive only                         0.928                0.997                   0.328                0.105
+```
+
+1. **The objective changed the result more than ten times as much data.** Label transfer rose from 0.48 (masked-gene loss; the first row is a re-run of the experiment above, which gave 0.49) to **0.94** with the contrastive term added and 0.93 with the contrastive term alone, equal to PCA (0.94–0.96); a ten-fold increase in pretraining data under the masked-gene objective had moved it from 0.51 to 0.49.
+2. **It kept the cell-type structure while mixing the studies.** The silhouette by cell type rose from 0.05 to 0.33–0.34 (PCA 0.29–0.37) while the study separation within type stayed low (0.11 and 0.105 against 0.46–0.52 for PCA): the embedding is more batch-robust than PCA *and* separates types as well.
+3. **The masked-gene term contributed nothing measurable** once the contrastive term was present (0.935 against 0.928 for contrastive alone; the difference is within the seed noise we saw between re-runs, about 0.01).
+4. **A favorable setting, to be read as such.** The thinning augmentation targets precisely the nuisance (sequencing depth) that differs most between the new study (mean UMI 1,260) and the corpus (about 3,000), and the simulated world has simple cluster structure; one seed per condition. The robust finding is the *ordering of factors* (objective before data size, in this miniature) and the principle that *the pretraining objective should encode the invariances the downstream task needs*, not the absolute accuracy. Whether the same holds for real atlases, with batch effects that are not depth effects, is the question the factorial pretraining study of Chapter 58 (Case 1) is designed to answer.
 
 !!! lens "Research lens: assumptions of the experiment"
     A small simulated atlas (1,000 genes; known and simple structure), a four-layer transformer trained for 800 steps with no tuning, a rank encoding of only the top 96 genes, one random seed per condition, and a world in which PCA suffices. A larger model, a longer schedule, or real atlases (with continuous cell-state structure and shared but heterogeneous programs) could change the picture; the experiment is a *template for isolating factors* (data, objective, tokenization, baseline, metric), not a verdict on published models.
@@ -155,7 +180,7 @@
     2. Independent zero-shot evaluations found several models behind HVG + PCA, scVI, and Harmony on cell-type separation and batch integration [[S]].
     3. In a controlled miniature, PCA reached label-transfer accuracy 0.94–0.96; a rank-encoding transformer pretrained on 2,000 or 19,800 cells reached 0.49–0.51, *equal to the random-weight network (0.50)*; pretraining improved only novel-type detection (0.98–0.995 against 0.60).
     4. **Batch-mixing scores reward uninformative embeddings**: the mini-FM had the best study mixing (0.04 against 0.46–0.52) and almost no cell-type structure.
-    5. @@TAKEAWAY5@@
+    5. **The objective mattered more than the data**: adding a contrastive depth-invariance term lifted the same mini-FM's label transfer from 0.48 to 0.94 (contrastive alone 0.93; PCA 0.94–0.96) with study mixing 0.11 (PCA 0.46–0.52) and cell-type silhouette 0.34, whereas ten times more pretraining cells under the masked-gene objective moved it from 0.51 to 0.49; a favorable simulation (the augmentation targets the simulated depth shift), one seed.
     6. Fine-tuning with labels, in-silico perturbation, and cross-species transfer have positive but modest and unreplicated evidence; scaling laws are unestablished [[P]]/[[H]].
     7. Practical rule: always run HVG + PCA and scVI/Harmony baselines, use paired metrics with a ceiling, and treat attention maps as hypotheses.
 
