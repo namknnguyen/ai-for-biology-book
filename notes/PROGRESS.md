@@ -15,7 +15,37 @@ Legend: [x] written + built + math-checked; [ ] pending.
 
 ## Chapters
 - [x] 1 Expert chain (code/ch01_noise_ceiling.py)
-(update as chapters are completed)
+- [x] 2 Linear algebra (code/ch02_linear_algebra.py)
+- [x] 3 Calculus & optimization (code/ch03_optimization.py)
+- [x] 4 Probability/statistics (code/ch04_statistics.py)
+- [x] 5 Information theory (code/ch05_information.py)
+- [x] 6 Computational thinking (code/ch06_dynamic_programming.py, ch06_training_skeleton.py)
+- [x] 7 Statistical learning (code/ch07_generalization.py)
+- [x] 8 Latent-variable models (code/ch08_latent_variables.py)
+- [x] 9 Backprop (code/ch09_autograd.py)
+- [x] 10 CNNs (code/ch10_cnn_grammar.py)
+- [x] 11 RNN/SSM/long conv (code/ch11_sequence_models.py)
+- [x] 12 Attention (code/ch12_attention.py)
+- [x] 13 Representation learning (code/ch13_representation.py)
+- [x] 14 Generative I (code/ch14_generative.py)
+(next: 15 diffusion, 16 geometric DL, 17 foundation models/scaling, 18 interpretability/eval, then Part V ...)
+
+## Chapter template actually used (keep consistent)
+`!!! abstract "Chapter at a glance"` (Motivation / Prerequisites / You will be able to), numbered sections 'N.M', derivations inline,
+`!!! math` for side derivations, `!!! lens`, `!!! rhyme`, `!!! bio` (biology chapters), `!!! paper` dissections, 2 worked examples
+(`!!! example "Worked Research Example N.K: ..."` with Situation / Question / Reasoning steps / Expert analysis), `!!! notebook`,
+Connections, `!!! takeaways`, Further reading. Code shown via `--8<-- "code/xxx.py"` inside a fenced block, followed by the
+actual script output pasted in a ```text block. Evidence badges [[E]] [[S]] [[P]] [[H]] [[X]].
+Cross-refs: "Chapter N" plain text (no links needed).
+
+## Verification commands
+mkdocs build 2>&1 | grep -iE "ERROR|snippet" ; MJ_NODE_MODULES=<scratchpad>/tools/node_modules node tools/check_math.mjs site
+Python deps installed in sandbox: numpy scipy torch scikit-learn mkdocs-material playwright.
+
+## Git/push status
+Local commits only; `git push` and MCP writes return 403 (GitHub App lacks write access to namknnguyen/ai-for-biology-book).
+Retry push at milestones. If still blocked at the end: tell user to install/authorize Claude GitHub App with write access, then push branch
+claude/compassionate-archimedes-d1r2q8 and set Settings > Pages > Source: GitHub Actions.
 
 ## Verified facts (Oct 2026 web checks) to reuse
 - Evo 2: Nature 652, 1349-1361, published 4 Mar 2026 (preprint Feb 2025); 40B params, 1 Mb context, >9T nucleotides, 100k+ species; fully open (data, code, weights). First author Garyk Brixi.
@@ -31,3 +61,7 @@ Legend: [x] written + built + math-checked; [ ] pending.
 - Tahoe-100M: >100M cells, 50 cancer cell lines, >1,100 small molecules (379 drugs?), published in Cell 2026. X-Atlas/Orion (Xaira): 8M cells, genome-wide Perturb-seq in HCT116 and HEK293T (June 2025).
 - Robin (FutureHouse): ripasudil for dry AMD, 2.5 months; Kosmos (Edison Scientific, Nov 2025); Google Co-Scientist.
 - DNA LM benchmarks: Tang & Koo (rep power, 2025), DART-Eval (2025), GENEB (2026) — little advantage over one-hot supervised on human regulatory tasks.
+
+- Evo (Nguyen et al., Science 2024, 386:eado9336): 7B params, 131,072-token context, StripedHyena (attention + data-controlled convolutions), OpenGenome ~300B prokaryotic nucleotides, byte-level single-nt tokenizer.
+- Evo 2 architecture: StripedHyena 2 = convolutional multi-hybrid with short explicit (SE), medium regularized (MR), long implicit (LI) Hyena operators + attention; pretrain at 8,192 ctx then midtraining extending to 1M; 40B params; >9T nucleotides.
+- HyenaDNA (Nguyen et al. 2023): up to 1M-token single-nucleotide context; up to 160x faster than Transformer w/ FlashAttention; 1.6M params vs 2.5B on NT benchmark comparisons.
