@@ -6,6 +6,7 @@ How the major concepts build on one another. An arrow $A \to B$ means *B uses id
 
 ```mermaid
 flowchart TD
+  P0["Part 0<br/>Mathematical background<br/>logic · functions · calculus · linear algebra · probability · statistics · discrete maths · Python"]
   P1["Part I<br/>Orientation<br/>Expert Chain · Four Gaps · Measurement view"]
   P2["Part II<br/>Foundations<br/>linear algebra · optimization · probability · information · implementation"]
   P3["Part III<br/>Core ML<br/>generalization · latent variables"]
@@ -17,6 +18,8 @@ flowchart TD
   P9["Part IX<br/>The frontier<br/>paradigms · open-problem atlas · AI scientists"]
   P10["Part X<br/>Independent research<br/>ten attacks · evaluating ideas · case studies · programs"]
 
+  P0 --> P1
+  P0 --> P2
   P1 --> P2 --> P3 --> P4
   P1 --> P5
   P2 -.-> P5

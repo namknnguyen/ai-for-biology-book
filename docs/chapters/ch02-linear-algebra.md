@@ -5,6 +5,10 @@
     **Prerequisites.** Basic familiarity with vectors and matrices. This chapter is compact: it teaches only what later chapters use.
     **You will be able to:** (1) read tensor shapes fluently and compute the cost of a matrix operation; (2) derive PCA/SVD and the Eckart–Young theorem; (3) explain what "low-rank structure" means for cells, genotypes, and attention; (4) recognize when a leading principal component is a batch effect or population structure rather than the biology you care about; (5) use high-dimensional geometry (near-orthogonality, concentration) to reason about embeddings.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M5](m05-linear-algebra-1.md) (vectors, matrices, linear systems) and [M6](m06-linear-algebra-2.md) (subspaces, eigenvalues, the SVD).
+
 ---
 
 ## 2.1 Why linear algebra comes first

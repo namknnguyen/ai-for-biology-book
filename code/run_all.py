@@ -15,6 +15,9 @@ import argparse, os, subprocess, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 # (file, approximate minutes, needs a download on first run, note)
 SCRIPTS = [
+    ("m01_language.py", 0.1, False, "Part 0"), ("m02_functions.py", 0.1, False, "Part 0"), ("m03_calculus.py", 0.1, False, "Part 0"), ("m04_multivariable.py", 0.2, False, "Part 0"),
+    ("m05_linalg1.py", 0.1, False, "Part 0"), ("m06_linalg2.py", 0.1, False, "Part 0"), ("m07_probability.py", 0.5, False, "Part 0"), ("m08_statistics.py", 0.5, False, "Part 0"),
+    ("m09_discrete.py", 0.2, False, "Part 0"), ("m10_numerics.py", 0.3, False, "Part 0; torch for the autograd example"),
     ("ch01_noise_ceiling.py", 0.2, False, ""), ("ch02_linear_algebra.py", 0.1, False, ""), ("ch03_optimization.py", 0.1, False, ""), ("ch04_statistics.py", 0.2, False, ""),
     ("ch05_information.py", 0.1, False, ""), ("ch06_dynamic_programming.py", 0.1, False, ""), ("ch06_training_skeleton.py", 1, False, "torch"), ("ch07_generalization.py", 1, False, ""),
     ("ch08_latent_variables.py", 0.5, False, ""), ("ch09_autograd.py", 0.2, False, ""), ("ch10_cnn_grammar.py", 3, False, "torch"), ("ch11_sequence_models.py", 0.2, False, ""),

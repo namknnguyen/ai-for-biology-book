@@ -2,6 +2,8 @@
 
 Consistency matters more than elegance. The book fixes one notation and uses it everywhere. When a symbol must be overloaded, the chapter says so explicitly.
 
+*Part 0 chapters are numbered M1–M10 and cited as "Chapter M5", "§M7.4", and so on, to keep the numbering of the main chapters (1–59) unchanged. Part 0 introduces this notation from scratch.*
+
 ## Typography
 
 | Object | Convention | Example |

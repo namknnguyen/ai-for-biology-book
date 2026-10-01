@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 2–3.
     **You will be able to:** (1) derive common loss functions as negative log-likelihoods; (2) derive the negative binomial from a Gamma–Poisson mixture and explain why it models sequencing counts; (3) perform Bayesian updates with conjugate priors and read ridge/LASSO as MAP estimation; (4) explain multiple testing, FDR, and the winner's curse; (5) diagnose pseudoreplication and compute an effective sample size; (6) use likelihood ratios to reason about how much a result should change your belief.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M7](m07-probability.md) (probability and distributions) and [M8](m08-statistics.md) (estimation, p-values, multiple testing).
+
 ---
 
 ## 4.1 Why this chapter matters more than its length suggests

@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 4–5 (likelihood, KL), Chapter 6 (HMM forward algorithm).
     **You will be able to:** (1) write a generative story with latent variables and read a plate diagram; (2) derive the ELBO and the EM algorithm and prove EM increases the likelihood; (3) derive the reparameterization gradient; (4) read conditional independence from a graphical model, including Gaussian precision matrices; (5) explain why latent axes are generally *not identifiable* and what that implies for biological interpretation; (6) recognize latent-variable structure in phylogenetics, haplotype imputation, and single-cell models.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M7](m07-probability.md) (Bayes' rule and distributions) and [M8](m08-statistics.md) (maximum likelihood).
+
 ---
 
 ## 8.1 Why latent variables?

@@ -16,6 +16,45 @@ Each chapter lists its principal teaching goal. Chapters in Parts VII–X carry 
 
 ---
 
+## Part 0: Mathematical Background
+
+*For a first-year student: everything the rest of the book assumes, from high-school algebra upward. Skip what you already know; a placement check is in the guide.*
+
+**[Guide: Start Here](../chapters/m00-part0-guide.md)**
+Who Part 0 is for; a 14-question placement check; three paths (full, fast, targeted); which book chapters need which background; how to study; what Part 0 does not cover.
+
+**[M1. The Language of Mathematics](../chapters/m01-language-of-mathematics.md)**
+Reading a formula; sets and functions (the genetic code as a non-injective map); logic, quantifiers, converse and contrapositive, necessary and sufficient; proof by induction and contradiction; sums, products, indicators; orders of magnitude and big-$O$; counting, binomial coefficients, Stirling; the birthday problem and barcode collisions.
+
+**[M2. Functions, Exponentials, Logarithms, and Models](../chapters/m02-functions-exponentials-logs.md)**
+Linear, polynomial, exponential and power-law models; doubling time and half-life; logarithm rules and log fold change; Hill and logistic functions; oscillations and phase; composition and neural-network layers; log-sum-exp and numerical safety.
+
+**[M3. Single-Variable Calculus](../chapters/m03-single-variable-calculus.md)**
+Limits and derivatives; the chain rule; finite differences and their U-shaped error; optimization and maximum likelihood; Newton's method; Taylor series; integrals and the Fundamental Theorem; production–degradation ODEs and Euler's method; convexity and Jensen's inequality.
+
+**[M4. Multivariable Calculus and Optimization](../chapters/m04-multivariable-calculus-optimization.md)**
+Partial derivatives, gradient, Jacobian and the multivariable chain rule; Hessians and saddles; gradient descent and conditioning; least squares from the gradient; Lagrange multipliers and the Boltzmann/softmax distribution; multiple integrals and change of variables.
+
+**[M5. Linear Algebra I](../chapters/m05-linear-algebra-1.md)**
+Vectors, dot products and cosine similarity; matrices as tables and maps; matrix multiplication in three views; Gaussian elimination; determinants and geometry; the stoichiometric matrix and steady-state fluxes; conditioning.
+
+**[M6. Linear Algebra II](../chapters/m06-linear-algebra-2.md)**
+Span, independence, basis, dimension; the four fundamental subspaces; orthogonal projection and least squares; eigenvalues, the Jukes–Cantor model and Markov chains; symmetric and covariance matrices; the SVD, Eckart–Young and PCA.
+
+**[M7. Probability from the Ground Up](../chapters/m07-probability.md)**
+Axioms, conditional probability and Bayes' rule; random variables, expectation, variance, covariance; the distribution zoo (binomial, Poisson, Gaussian, negative binomial, ...); joint and marginal distributions; the law of large numbers, the central limit theorem and Monte Carlo.
+
+**[M8. Statistics from the Ground Up](../chapters/m08-statistics.md)**
+Estimators, bias and variance; maximum likelihood; confidence intervals and the bootstrap; p-values and power; multiple testing (Bonferroni, Benjamini–Hochberg); regression and the winner's curse; Simpson's paradox; Bayesian updating.
+
+**[M9. Discrete Structures, Algorithms, and Complexity](../chapters/m09-discrete-structures.md)**
+Graphs, adjacency matrices and Laplacians; trees, Newick and UPGMA; DAGs; big-$O$ and hashing; dynamic programming and edit distance; $k$-mers and genome assembly as an Eulerian path.
+
+**[M10. Python and Numerical Computing](../chapters/m10-python-numerical-computing.md)**
+Environments and reproducibility; Python for sequences; NumPy shapes and broadcasting; vectorization; floating-point error and stable algorithms; random seeds; looking at data; autograd; habits for trustworthy code.
+
+---
+
 ## Part I — Orientation
 
 **[1. The Anatomy of a Research Problem in AI for Biology](../chapters/ch01-expert-chain.md)**

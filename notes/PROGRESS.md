@@ -14,7 +14,7 @@ Legend: [x] written + built + math-checked; [ ] pending.
 - [x] index, how-to-use, toc, dependency-graph, learning-trajectory, field-map, research-skills, notation
 
 ## Chapters
-All 59 chapters, the front matter, and Appendices A-G exist; `mkdocs build --strict` passes and the MathJax parse check reports 0 errors.
+All 59 chapters, Part 0 (guide + ten chapters M1-M10, added at the user's request for first-year readers), the front matter, and Appendices A-G exist; `mkdocs build --strict` passes and the MathJax parse check reports 0 errors.
 - Ch 1-31, 33, 43-45, 55-57, 59: written in earlier sessions (see git log).
 - Ch 32 genomic LMs, 34 protein LMs, 35 structure prediction, 36 design, 37 molecular ML, 38 single-cell FMs, 39 perturbation/virtual cell,
   40 multimodal, 41 genotype-phenotype, 42 evolutionary modeling, 47 scaling and data economics, 48 mechanistic interpretability,
@@ -59,3 +59,12 @@ claude/compassionate-archimedes-d1r2q8 and set Settings > Pages > Source: GitHub
 - Evo (Nguyen et al., Science 2024, 386:eado9336): 7B params, 131,072-token context, StripedHyena (attention + data-controlled convolutions), OpenGenome ~300B prokaryotic nucleotides, byte-level single-nt tokenizer.
 - Evo 2 architecture: StripedHyena 2 = convolutional multi-hybrid with short explicit (SE), medium regularized (MR), long implicit (LI) Hyena operators + attention; pretrain at 8,192 ctx then midtraining extending to 1M; 40B params; >9T nucleotides.
 - HyenaDNA (Nguyen et al. 2023): up to 1M-token single-nucleotide context; up to 160x faster than Transformer w/ FlashAttention; 1.6M params vs 2.5B on NT benchmark comparisons.
+
+## Part 0 (mathematical background for a first-year student)
+- docs/chapters/m00-part0-guide.md (placement check, paths, dependency map) and m01-m10 (language/proof/counting, functions/logs, calculus 1,
+  multivariable calculus/optimization, linear algebra I and II, probability, statistics, discrete structures/algorithms, Python/numerics).
+- Each chapter has a tested script code/m01_*.py ... m10_*.py with its real output pasted in; all are in code/run_all.py and Appendix C.
+- Integrated into mkdocs nav, index, how-to-use (new "From scratch" path), toc, dependency graph, learning trajectory, notation, README,
+  Appendix A pointer, and "If this chapter moves too fast" notes in Chapters 1-9, 12, 16, 21, 26, 27, 42.
+- tools/fix_display_math.py: blank lines around $$ fences (a bug that rendered 167 display equations as raw TeX before it was fixed).
+- tools/build_pdf.py + mkdocs-pdf.yml: PDF build (Chromium, local MathJax/Mermaid; use --untagged to keep the file under 30 MB).

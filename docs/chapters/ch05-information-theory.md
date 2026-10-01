@@ -5,6 +5,10 @@
     **Prerequisites.** Chapter 4 (likelihood, expectation).
     **You will be able to:** (1) define entropy, cross-entropy, KL divergence, and mutual information and prove their key properties; (2) show that maximum likelihood minimizes a KL divergence and explain forward versus reverse KL; (3) prove the data-processing inequality and state what it forbids; (4) explain why a language model is a compressor and what "bits per base" measures; (5) analyze motifs, measurements, and selection as information channels; (6) derive the relationship between a sequence model's log-likelihood ratio and evolutionary fitness, with its assumptions.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M2](m02-functions-exponentials-logs.md) (logarithms) and [M7](m07-probability.md) (expectation and distributions).
+
 ---
 
 ## 5.1 Why information theory belongs in a biology-ML book

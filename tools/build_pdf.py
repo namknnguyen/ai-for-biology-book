@@ -121,12 +121,11 @@ COVER = """
   <div class="title">AI for Biology</div>
   <div class="rule"></div>
   <div class="sub">From First Principles to the Research Frontier</div>
-  <div class="meta">59 chapters &middot; 7 appendices &middot; 57 runnable experiments<br>
+  <div class="meta">Part 0: mathematical background from high-school algebra (10 chapters) &middot; 59 chapters &middot; 7 appendices &middot; 66 runnable experiments<br>
   Deep learning &amp; foundation models &middot; genomics &middot; proteins &middot; drug discovery<br>
   single-cell &amp; spatial biology &middot; evolution &middot; multimodal models &middot; neuroscience<br><br>
   Online edition: namknnguyen.github.io/ai-for-biology-book<br>
   Many 2025&ndash;26 results are developer-reported; each carries an evidence grade.</div>
-</div>
 """
 
 HEADER = "<div></div>"
@@ -180,7 +179,7 @@ with sync_playwright() as p:
     print("page:", json.dumps(info), "shrunk diagrams:", shrunk, "console errors:", [e[:100] for e in errs if 'ERR_FAILED' not in e][:5], flush=True)
     os.makedirs(os.path.dirname(out), exist_ok=True)
     pdf_args = dict(path=out, format="A4", print_background=True, display_header_footer=True,
-                    header_template=HEADER, footer_template=FOOTER, outline=True, tagged=True,
+                    header_template=HEADER, footer_template=FOOTER, outline=True, tagged="--untagged" not in sys.argv,
                     margin={"top": "20mm", "bottom": "22mm", "left": "17mm", "right": "17mm"})
     # pass 1: find the page of every heading that appears in the table of contents
     pg.pdf(**pdf_args)

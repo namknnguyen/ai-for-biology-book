@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 3–5, 8, 20.
     **You will be able to:** (1) derive the Wright–Fisher variance of drift, heterozygosity decay, and neutral fixation probability; (2) state and use the fixation probability under selection and explain "nearly neutral"; (3) derive coalescent results (time to the most recent common ancestor, tree length, segregating sites, the neutral site-frequency spectrum); (4) derive linkage-disequilibrium decay; (5) derive the Jukes–Cantor model and use continuous-time Markov substitution models; (6) explain why phylogenetic structure inflates false positives and how to correct for it, and why this matters for sequence models.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M7](m07-probability.md) (binomial sampling and Markov chains) and [M6](m06-linear-algebra-2.md) (rate matrices).
+
 ---
 
 ## 21.1 Why a machine-learning book needs population genetics

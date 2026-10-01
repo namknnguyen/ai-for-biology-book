@@ -6,7 +6,7 @@ deep learning, genomics, protein science, single-cell biology, drug discovery, a
 **Read it online:** <https://namknnguyen.github.io/ai-for-biology-book/>  
 **PDF edition (462 pages):** [`docs/assets/ai-for-biology-book.pdf`](docs/assets/ai-for-biology-book.pdf)
 
-The book is organized as ten parts: orientation, mathematical foundations, core machine learning, deep learning,
+The book is organized as ten parts, preceded by a **Part 0** that teaches the mathematical and computational background from high-school algebra upward (ten chapters, M1–M10, for a first-year student): orientation, mathematical foundations, core machine learning, deep learning,
 biology for modeling, computational biology, biological foundation models, research methodology, the frontier,
 and independent research. The last third is written as a research training manual: open problems, systematic
 idea generation, and reasoning when the answer is not known.

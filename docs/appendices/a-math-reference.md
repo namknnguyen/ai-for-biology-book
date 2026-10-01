@@ -2,6 +2,9 @@
 
 A compact collection of the identities and results used repeatedly in the book, each with the chapter in which it is derived. Notation follows the notation page: sequences $x_{1:L}$, batch $B$, model width $d$, latent state $s$, parameters $\theta$.
 
+!!! tip "If this appendix moves too fast"
+    Every topic here is taught from the ground up in **Part 0**: calculus in Chapters [M3](../chapters/m03-single-variable-calculus.md) and [M4](../chapters/m04-multivariable-calculus-optimization.md), linear algebra in [M5](../chapters/m05-linear-algebra-1.md) and [M6](../chapters/m06-linear-algebra-2.md), probability and statistics in [M7](../chapters/m07-probability.md) and [M8](../chapters/m08-statistics.md), discrete mathematics in [M9](../chapters/m09-discrete-structures.md).
+
 ---
 
 ## A.1 Linear algebra (Chapter 2)

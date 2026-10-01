@@ -105,6 +105,18 @@ nav:
     - Map of the Fields: front/field-map.md
     - Research Skills: front/research-skills.md
     - Notation and Conventions: front/notation.md
+  - "Part 0 — Mathematical Background":
+    - "Guide: Start Here": chapters/m00-part0-guide.md
+    - "M1. The Language of Mathematics": chapters/m01-language-of-mathematics.md
+    - "M2. Functions, Exponentials, Logs": chapters/m02-functions-exponentials-logs.md
+    - "M3. Single-Variable Calculus": chapters/m03-single-variable-calculus.md
+    - "M4. Multivariable Calculus": chapters/m04-multivariable-calculus-optimization.md
+    - "M5. Linear Algebra I": chapters/m05-linear-algebra-1.md
+    - "M6. Linear Algebra II": chapters/m06-linear-algebra-2.md
+    - "M7. Probability": chapters/m07-probability.md
+    - "M8. Statistics": chapters/m08-statistics.md
+    - "M9. Discrete Structures": chapters/m09-discrete-structures.md
+    - "M10. Python and Numerics": chapters/m10-python-numerical-computing.md
   - "Part I — Orientation":
     - "1. The Anatomy of a Research Problem": chapters/ch01-expert-chain.md
   - "Part II — Foundations":

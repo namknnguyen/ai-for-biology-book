@@ -5,6 +5,10 @@
     **Prerequisites.** None. This chapter is deliberately light on mathematics; its equations are short and are all re-derived later.
     **You will be able to:** (1) describe a biological dataset as a measurement of a latent system; (2) name the **Four Gaps** that separate a model's score from a biological claim; (3) use the twelve-link **Expert Chain** to take a problem to new research directions; (4) place any claim on the **Claim Ladder** and say what evidence it needs; (5) do a first, complete research-reasoning analysis of a published-style result.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M1](m01-language-of-mathematics.md) (reading formulas, logic and quantifiers, counting) and [M7](m07-probability.md) (conditional probability and Bayes' rule).
+
 ---
 
 ## 1.1 Four results, one question

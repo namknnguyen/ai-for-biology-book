@@ -11,7 +11,7 @@ flowchart LR
 
 ## Stage 1: Beginner (Parts I–III, Chapters 1–8)
 
-**You arrive able to:** write short Python programs; recall basic calculus and probability.
+**You arrive able to:** write short Python programs; recall basic calculus, linear algebra and probability. *(If you do not yet have this background, Part 0 builds it from high-school algebra: start at the [Part 0 guide](../chapters/m00-part0-guide.md).)*
 
 **You leave able to:**
 

@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 4, 5, 20, 21, 23, 29, 34, 43, 45.
     **You will be able to:** (1) write a continuous-time Markov substitution model and compute the likelihood of a tree by pruning; (2) explain what ancestral sequence reconstruction does and why maximum-likelihood ancestors are biased; (3) compute the effective sample size implied by a phylogeny and correct a comparative test; (4) say what is and is not known about forecasting evolution; (5) design clade-aware splits and evaluations for machine-learning models of sequences; (6) read evolutionary claims with their rung on the claim ladder.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M6](m06-linear-algebra-2.md) (rate matrices and matrix exponentials) and [M9](m09-discrete-structures.md) (trees and UPGMA).
+
 ---
 
 ## 42.0 Why a book on AI for biology has an evolution chapter

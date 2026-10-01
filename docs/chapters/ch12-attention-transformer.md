@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 2, 3, 9; Chapters 10–11 for comparison.
     **You will be able to:** (1) derive scaled dot-product attention and explain the $1/\sqrt{d_k}$ factor; (2) write multi-head attention with tensor shapes and compute its parameters and FLOPs; (3) explain why positional information must be added and derive rotary embeddings; (4) derive the online-softmax trick behind FlashAttention; (5) relate attention to kernel regression, Hopfield networks, and Potts models; (6) critique claims that attention maps "reveal" biology.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M2](m02-functions-exponentials-logs.md) (softmax and log-sum-exp) and [M5](m05-linear-algebra-1.md) (matrix products and shapes).
+
 ---
 
 ## 12.1 Why attention, for biology

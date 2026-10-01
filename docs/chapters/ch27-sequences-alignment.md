@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 4, 5, 6 (dynamic programming and HMMs), 8 (EM), 20.
     **You will be able to:** (1) derive substitution scores as log-likelihood ratios and compute the information per aligned position; (2) state and verify Karlin–Altschul statistics, convert scores to E-values, and say how long an alignment must be to be significant; (3) derive FM-index backward search and explain why mapping is $O(m)$ independent of genome size; (4) explain mappability, repeats, and why short reads cannot resolve recent repeats; (5) derive genotype likelihoods, and explain which errors depth fixes and which it does not; (6) formulate transcript quantification as a mixture model solved by EM; (7) say what the classical pipeline's blind spots imply for the training data of sequence models.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M9](m09-discrete-structures.md) (dynamic programming).
+
 ---
 
 ## 27.1 What the data are: reads, references, and alignment

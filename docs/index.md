@@ -9,7 +9,7 @@
 
 Most textbooks teach methods. This one teaches **research reasoning** and uses methods, mathematics, biology, and the literature as the material that reasoning operates on.
 
-You will start from linear algebra and end by designing, attacking, and defending your own research programs. Along the way you will:
+You will start from the mathematical background a first-year student needs (Part 0) and end by designing, attacking, and defending your own research programs. Along the way you will:
 
 - **Derive** the mathematics that modern biological AI rests on (backpropagation, attention, variational inference, diffusion, contrastive learning, statistical genetics, coalescent theory, causal identification), not merely state it.
 - **Learn biology for modeling**: for every biological object you will ask what information it contains, how it is generated, how it is measured, how it is represented computationally, what varies, what a model can learn from it, and what a model *cannot* observe.
@@ -26,6 +26,7 @@ Every chapter is organized so that it contributes to a single skill: moving alon
 
 | Part | Theme | Chapters | What it gives you |
 |---|---|---|---|
+| **0** | Mathematical background | M1–M10 | For a first-year student: logic and proof, functions and logarithms, calculus in one and several variables, linear algebra, probability, statistics, discrete mathematics and algorithms, Python and numerical computing. Skip what you know |
 | **I** | Orientation | 1 | The Expert Chain, the Four Gaps, and the measurement view of biology: the spine of everything else |
 | **II** | Foundations | 2–6 | Linear algebra, optimization, probability, information theory, and implementation, taught efficiently and only as far as research needs |
 | **III** | Core machine learning | 7–8 | Generalization, inductive bias, latent-variable inference |
@@ -38,7 +39,9 @@ Every chapter is organized so that it contributes to a single skill: moving alon
 | **X** | Independent research | 55–59 | Ten systematic strategies for generating ideas, evaluating them, reading papers, reasoning without answers, and turning ideas into research programs |
 
 !!! tip "PDF edition"
-    A single-file PDF of the whole book (462 pages, with bookmarks and a linked contents list) is available: [**download ai-for-biology-book.pdf**](assets/ai-for-biology-book.pdf) (about 42 MB).
+    A single-file PDF of the whole book (about 560 pages, with bookmarks and a linked contents list) is available: [**download ai-for-biology-book.pdf**](assets/ai-for-biology-book.pdf) (about 42 MB).
+
+**New to the mathematics?** Begin with the [Part 0 guide](chapters/m00-part0-guide.md): a placement check and ten chapters that take you from high-school algebra to everything the rest of the book assumes.
 
 Start with the [**complete table of contents**](front/toc.md), the [**dependency graph**](front/dependency-graph.md) that shows how concepts build on one another, the [**learning trajectory**](front/learning-trajectory.md), the [**map of the fields**](front/field-map.md), and the list of [**research skills**](front/research-skills.md) the book is designed to develop. Then read [How to use this book](front/how-to-use.md) and begin [Chapter 1](chapters/ch01-expert-chain.md).
 

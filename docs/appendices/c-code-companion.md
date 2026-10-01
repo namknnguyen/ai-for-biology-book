@@ -30,7 +30,7 @@ python code/ch39_perturbation.py               # or run any script directly
 
 ## C.2 Conventions in the code
 
-- **One file, one chapter.** The file name starts with the chapter number. A suffix such as `b` marks a second experiment for the same chapter (`ch32b`, `ch36b`, `ch38b`).
+- **One file, one chapter.** The file name starts with the chapter number (`m01`–`m10` for the Part 0 chapters M1–M10). A suffix such as `b` marks a second experiment for the same chapter (`ch32b`, `ch36b`, `ch38b`).
 - **Tensor shapes are commented.** Where a model manipulates arrays or tensors, each line states the shape: `B` batch, `L` length, `d` width, `H` heads.
 - **Seeds are fixed in the file.** A script prints the same numbers on the same library versions. Results that depend on thread counts (torch training with several threads) can differ in the last digits.
 - **A script states its assumptions in its docstring** and prints a table whose columns are those discussed in the chapter. The chapter pastes this output verbatim in a `text` block directly below the code.
@@ -43,6 +43,16 @@ python code/ch39_perturbation.py               # or run any script directly
 
 | Chapter | Script | What it demonstrates | ~min | Needs |
 |---|---|---|---|---|
+| M1 | `m01_language.py` | The genetic code as a function, induction checks, counting, the birthday problem for barcodes | 0.1 | |
+| M2 | `m02_functions.py` | PCR and half-life, power-law fits, Hill curves, log fold change, log-sum-exp, periodogram | 0.1 | |
+| M3 | `m03_calculus.py` | Finite-difference error, Taylor series, Riemann sums, mRNA ODE with Euler, Newton, Jensen | 0.1 | |
+| M4 | `m04_multivariable.py` | Gradients, Jacobians, Hessians, gradient descent vs conditioning, maximum entropy | 0.2 | |
+| M5 | `m05_linalg1.py` | Matrix products, Gaussian elimination, geometry, stoichiometric null space, conditioning | 0.1 | |
+| M6 | `m06_linalg2.py` | Rank, projection, Jukes–Cantor, Markov chains, covariance, SVD and PCA | 0.1 | |
+| M7 | `m07_probability.py` | Bayes' rule, distributions, CLT, Monte Carlo | 0.5 | |
+| M8 | `m08_statistics.py` | Coverage, p-values, multiple testing, bootstrap, winner's curse, Simpson, power | 0.5 | |
+| M9 | `m09_discrete.py` | Graphs, UPGMA, edit distance, de Bruijn assembly, k-mer counts | 0.2 | |
+| M10 | `m10_numerics.py` | FASTA in Python, broadcasting, vectorization, floating point, seeds, autograd | 0.3 | torch |
 | 1 | `ch01_noise_ceiling.py` | What "$R^2=0.7$" means: noise ceilings and split leakage | 0.2 | |
 | 2 | `ch02_linear_algebra.py` | Low-rank structure, PCA, what leading components measure | 0.1 | |
 | 3 | `ch03_optimization.py` | Conditioning, momentum, Adam, implicit regularization | 0.1 | |
@@ -96,7 +106,7 @@ python code/ch39_perturbation.py               # or run any script directly
 | 54 | `ch54_agent_verification.py` | Forking paths and judge drift in automated research | 0.3 | |
 | 56 | `ch56_information_gain.py` | Choosing experiments by expected information gain | 0.2 | |
 
-Chapters not listed (49–52, 55, 57–59 and the front matter) are conceptual or atlas chapters whose worked examples are procedures, not programs.
+Scripts for the Part 0 chapters (M1–M10) are listed first; they need only NumPy and SciPy (M10 also uses PyTorch for one example) and run in seconds. Chapters not listed (49–52, 55, 57–59 and the front matter) are conceptual or atlas chapters whose worked examples are procedures, not programs.
 
 ---
 

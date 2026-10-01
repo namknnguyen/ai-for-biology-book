@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 2–5; basic Python.
     **You will be able to:** (1) derive and implement dynamic-programming algorithms for sequences (alignment, HMM forward/Viterbi) and explain them as semiring computations; (2) estimate time, memory, and compute for a training run before launching it; (3) handle genomic coordinates and file formats without off-by-one errors; (4) write the unit tests that catch the majority of model bugs (overfit-one-batch, shape asserts, symmetry tests, shuffled-label controls); (5) organize an experiment so that it is reproducible and its splits cannot silently leak.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M9](m09-discrete-structures.md) (complexity and dynamic programming) and [M10](m10-python-numerical-computing.md) (Python, NumPy, floating point).
+
 ---
 
 ## 6.1 Computational thinking for biological data

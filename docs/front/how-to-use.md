@@ -2,7 +2,7 @@
 
 ## What kind of reader this assumes
 
-You can program a little (Python), remember some high-school calculus and probability, and have heard of DNA and neural networks. Nothing else is assumed. The foundations in Part II are intentionally compressed: they are meant to be *sufficient for research*, not a substitute for a full course. If you already know a topic, the chapter's opening "what you must be able to do" box tells you what to check and what to skip.
+The main text (Parts I–X) assumes you can program a little (Python), remember some calculus, linear algebra and probability, and have heard of DNA and neural networks. **If you are a first-year student, or the mathematics feels rusty, start with Part 0**: ten chapters (M1–M10) that teach the mathematical and numerical background from high-school algebra upward, with a placement check so you can skip what you know. Nothing beyond Part 0 is assumed. The foundations in Part II are intentionally compressed: they are meant to be *sufficient for research*, not a substitute for a full course. If you already know a topic, the chapter's opening "what you must be able to do" box tells you what to check and what to skip.
 
 ## Allocation of depth
 
@@ -60,6 +60,9 @@ Claims about science carry different weights. The book marks them:
 When you read the literature, practice assigning these grades yourself. Authors rarely do.
 
 ## Three reading paths
+
+=== "From scratch (first-year student)"
+    [Part 0 guide](../chapters/m00-part0-guide.md) → the placement check → M1–M10 in order (read M10's setup and Python sections first if you have never programmed) → Chapter 1 → Parts II–X in order. Part II then serves as a compressed research-level review of what Part 0 taught from the ground up.
 
 === "Full path (recommended)"
     Read in order. Parts II–III can be skimmed if you have a strong ML background, but *do read* Chapters 3 (optimization), 4 (statistics, especially multiple testing and Bayesian reasoning), and 5 (information theory), because later chapters reuse their language constantly.

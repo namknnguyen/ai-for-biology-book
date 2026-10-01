@@ -5,6 +5,10 @@
     **Prerequisites.** Chapter 2; single-variable calculus.
     **You will be able to:** (1) compute gradients and Jacobians and apply the multivariate chain rule; (2) derive the softmax cross-entropy gradient $\mathbf{p}-\mathbf{y}$; (3) analyze gradient descent on a quadratic and explain the role of the condition number; (4) explain momentum, Adam, warmup, and the noise of SGD; (5) show that gradient descent on an underdetermined least-squares problem finds the minimum-norm solution (implicit regularization); (6) diagnose "my loss won't go down" versus "my loss can't go down."
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M3](m03-single-variable-calculus.md) (derivatives, the chain rule, Taylor series) and [M4](m04-multivariable-calculus-optimization.md) (gradients, Hessians, gradient descent).
+
 ---
 
 ## 3.1 Why optimization is a scientific question, not just an engineering one

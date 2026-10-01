@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 2, 9, 10, 12, 15.
     **You will be able to:** (1) define invariance and equivariance and state why they help; (2) derive the GCN layer and prove permutation equivariance of message passing; (3) explain expressivity limits of GNNs (1-WL) and over-smoothing, with the numerical evidence; (4) construct and verify an E(n)-equivariant layer and explain why proteins need SE(3), not E(3); (5) explain why invariant point attention is invariant to global rigid motions; (6) recognize degree bias and scaffold leakage in graph benchmarks.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M9](m09-discrete-structures.md) (graphs and Laplacians) and [M6](m06-linear-algebra-2.md) (eigenvalues of symmetric matrices).
+
 ---
 
 ## 16.1 Symmetry as an inductive bias

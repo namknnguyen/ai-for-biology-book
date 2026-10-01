@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 2–3 (matrix calculus, chain rule, gradient descent).
     **You will be able to:** (1) define a feedforward network and state what universal approximation does and does not say; (2) **derive backpropagation** for an MLP with matrix shapes, and for an arbitrary computational graph; (3) implement reverse-mode autodiff from scratch and verify it against finite differences and PyTorch; (4) explain vanishing/exploding gradients and derive He initialization; (5) explain normalization layers and residual connections as *gradient-flow engineering*; (6) diagnose a failing training run by forming and testing hypotheses.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M3](m03-single-variable-calculus.md) (the chain rule) and [M4](m04-multivariable-calculus-optimization.md) (Jacobians) and [M10](m10-python-numerical-computing.md) (autograd and floating point).
+
 ---
 
 ## 9.1 From linear models to networks

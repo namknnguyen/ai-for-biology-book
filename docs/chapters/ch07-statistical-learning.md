@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 2–5.
     **You will be able to:** (1) state the learning problem and decompose error into approximation, estimation, and optimization; (2) derive the bias–variance decomposition and a finite-class generalization bound; (3) explain double descent and why the interpolation threshold is where least squares explodes; (4) choose among ridge, LASSO, kernels, and boosting by reasoning about genetic/regulatory architecture; (5) run cross-validation without leaking; (6) pick metrics (AUROC vs. AUPRC, between- vs. within-group correlation) that match the decision.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M6](m06-linear-algebra-2.md) (projection and the SVD) and [M8](m08-statistics.md) (bias, variance, regression).
+
 ---
 
 ## 7.1 The learning problem

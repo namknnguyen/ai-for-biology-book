@@ -5,6 +5,10 @@
     **Prerequisites.** Chapters 3, 4, 7, 20, 21.
     **You will be able to:** (1) state the additive model, define heritability variants (twin, SNP, liability-scale) and what $h^2$ does and does not mean; (2) derive how LD blurs causal signal into association signal, $z\approx\sqrt n R\beta$, and use it to explain why lead SNPs are not causal variants; (3) derive LD score regression and show why its intercept, not $\lambda_\text{GC}$, diagnoses confounding; (4) show that a linear mixed model is ridge regression; (5) compute Bayes-factor fine-mapping posterior inclusion probabilities and credible sets and know their limits; (6) derive the expected accuracy of a polygenic score and explain why portability across populations fails through tagging; (7) derive Mendelian randomization estimators and the effects of weak instruments and pleiotropy.
 
+
+!!! note "If this chapter moves too fast"
+    Part 0 teaches the prerequisites from scratch: [M8](m08-statistics.md) (regression and multiple testing) and [M6](m06-linear-algebra-2.md) (covariance matrices).
+
 ---
 
 ## 26.1 The seven questions for a genetic association
