@@ -68,7 +68,7 @@ def folds(split, seed=0):
     return [(np.flatnonzero(g != k), np.flatnonzero(g == k)) for k in range(5)]
 ACTIVE = 8.0; base_rate = (y >= ACTIVE).mean(); BUDGET = 0.05
 print(f"{n} molecules, {ncl} Butina clusters; 'potent' = pIC50 >= {ACTIVE} ({base_rate:.1%} of the data); atoms padded to {NMAX}; GCN: 3 residual graph-convolution layers, width 96, ensemble of 3, 80 epochs (fixed in advance)")
-print("metrics per model: Pearson r | RMSE | enrichment factor of potent compounds in the top 10% by prediction (1 = random; maximum %.1f) | potent hits among the 5%% of the test set chosen by prediction, as a multiple of random choice" % (1 / base_rate))
+print(f"metrics per model: Pearson r | RMSE | enrichment factor (EF@10%) of potent compounds in the top 10% by prediction (1 = random; maximum {1 / base_rate:.1f}) | potent hits among the 5% of the test set chosen by prediction, as a multiple of random choice")
 results = {}
 for split in ("random", "cluster"):
     acc = {m: [] for m in ("RF", "kNN (Tanimoto, k=5)", "GCN (1 net)", "GCN ensemble (3)", "RF + GCN ensemble")}; unc = []

@@ -60,38 +60,39 @@ def feats_oh(S):
     X = np.zeros((len(S), Lp * q), np.float32); X[np.arange(len(S))[:, None], np.arange(Lp)[None, :] * q + S] = 1; return X
 def hamming_nn(S, train): return np.array([np.min((train != s).sum(1)) for s in S])
 
-settings = [("prior samples (beta = inf)", None, None), ("beta = 1.0", 1.0, None), ("beta = 0.25", 0.25, None), ("beta = 0.1 (near argmax)", 0.1, None), ("beta = 0.1, ensemble lower bound (mean - 1 sd)", 0.1, 1.0)]
-n_land = 8
-print(f"== Designs sampled from p*(x) ~ prior(x) exp(f_hat(x)/beta): {Lp} positions x {q} letters; {n_land} hidden landscapes x 60 designs per setting ==")
-print("'latent fitness' is the landscape's additive-plus-pairwise score (natural-like sequences are Gibbs samples from a prior selected on it)")
-configs = [(60, "pair"), (150, "pair"), (400, "pair"), (400, "add"), (150, "mlp"), (400, "mlp")]
-store = {c: {s[0]: [] for s in settings} for c in configs}; heldout = {c: [] for c in configs}; train_mean = []
-for ls in range(n_land):
-    h, J = make_landscape(ls); r0 = np.random.default_rng(1000 + ls)
-    S_all = gibbs_prior_weights(h, J, 1.5, 700, 40, r0); S_te = S_all[400:]
-    for (N_train, kind) in configs:
-        ADDITIVE = kind == "add"; r = np.random.default_rng(2000 + ls); S_train = S_all[:N_train]; y = latent(h, J, S_train); lam = 3.0
-        if kind == "mlp":
-            wv = fit_mlp(S_train, y, ls); b0 = None; pred_fn = wv; heldout[(N_train, kind)].append(np.corrcoef(wv(S_te), latent(h, J, S_te))[0, 1] ** 2); ens = None
-        else:
-            Xtr = feats(S_train); wv, b0 = fit_ridge(Xtr, y, lam); pred_fn = lambda S2, wv=wv, b0=b0: feats(S2) @ wv + b0
-            heldout[(N_train, kind)].append(np.corrcoef(pred_fn(S_te), latent(h, J, S_te))[0, 1] ** 2)
-            ens = []
-            for _ in range(8):
-                bi = r.integers(0, N_train, N_train); w_, b_ = fit_ridge(Xtr[bi], y[bi], lam); ens.append((w_, b_))
-        if N_train == 400 and kind == "pair": train_mean.append(y.mean())
-        freq = np.stack([np.bincount(S_train[:, i], minlength=q) + 1.0 for i in range(Lp)]); logprior = np.log(freq / freq.sum(1, keepdims=True))
-        for name, beta, lcbl in settings:
-            if kind != "pair" and "ensemble" in name: continue
-            D = sample_design(wv, b0, logprior, beta, r, lcb=(ens, lcbl) if lcbl else None)
-            lt = latent(h, J, D); pred = pred_fn(D)
-            store[(N_train, kind)][name].append((pred.mean(), lt.mean(), hamming_nn(D, S_train).mean(), len(np.unique(D, axis=0)) / len(D)))
-ADDITIVE = False
-print(f"natural-like training sequences have mean latent fitness {np.mean(train_mean):.1f} (400 sequences)\n")
-print("surrogate                          training sequences   held-out R^2   design setting                                      surrogate's prediction   TRUE fitness   gap (pred - true)   distance to nearest training seq.   fraction unique")
-names = {"pair": "pairwise ridge", "add": "additive ridge (misspecified)", "mlp": "MLP, 2 hidden layers (flexible)"}
-for c in configs:
-    for name, _, _ in settings:
-        if not store[c][name]: continue
-        a = np.mean(store[c][name], 0)
-        print(f"{names[c[1]]:33s}  {c[0]:8d}            {np.mean(heldout[c]):6.2f}        {name:50s}  {a[0]:9.2f}               {a[1]:8.2f}       {a[0]-a[1]:8.2f}            {a[2]:8.1f}                {a[3]:8.2f}")
+if __name__ == "__main__":
+    settings = [("prior samples (beta = inf)", None, None), ("beta = 1.0", 1.0, None), ("beta = 0.25", 0.25, None), ("beta = 0.1 (near argmax)", 0.1, None), ("beta = 0.1, ensemble lower bound (mean - 1 sd)", 0.1, 1.0)]
+    n_land = 8
+    print(f"== Designs sampled from p*(x) ~ prior(x) exp(f_hat(x)/beta): {Lp} positions x {q} letters; {n_land} hidden landscapes x 60 designs per setting ==")
+    print("'latent fitness' is the landscape's additive-plus-pairwise score (natural-like sequences are Gibbs samples from a prior selected on it)")
+    configs = [(60, "pair"), (150, "pair"), (400, "pair"), (400, "add"), (150, "mlp"), (400, "mlp")]
+    store = {c: {s[0]: [] for s in settings} for c in configs}; heldout = {c: [] for c in configs}; train_mean = []
+    for ls in range(n_land):
+        h, J = make_landscape(ls); r0 = np.random.default_rng(1000 + ls)
+        S_all = gibbs_prior_weights(h, J, 1.5, 700, 40, r0); S_te = S_all[400:]
+        for (N_train, kind) in configs:
+            ADDITIVE = kind == "add"; r = np.random.default_rng(2000 + ls); S_train = S_all[:N_train]; y = latent(h, J, S_train); lam = 3.0
+            if kind == "mlp":
+                wv = fit_mlp(S_train, y, ls); b0 = None; pred_fn = wv; heldout[(N_train, kind)].append(np.corrcoef(wv(S_te), latent(h, J, S_te))[0, 1] ** 2); ens = None
+            else:
+                Xtr = feats(S_train); wv, b0 = fit_ridge(Xtr, y, lam); pred_fn = lambda S2, wv=wv, b0=b0: feats(S2) @ wv + b0
+                heldout[(N_train, kind)].append(np.corrcoef(pred_fn(S_te), latent(h, J, S_te))[0, 1] ** 2)
+                ens = []
+                for _ in range(8):
+                    bi = r.integers(0, N_train, N_train); w_, b_ = fit_ridge(Xtr[bi], y[bi], lam); ens.append((w_, b_))
+            if N_train == 400 and kind == "pair": train_mean.append(y.mean())
+            freq = np.stack([np.bincount(S_train[:, i], minlength=q) + 1.0 for i in range(Lp)]); logprior = np.log(freq / freq.sum(1, keepdims=True))
+            for name, beta, lcbl in settings:
+                if kind != "pair" and "ensemble" in name: continue
+                D = sample_design(wv, b0, logprior, beta, r, lcb=(ens, lcbl) if lcbl else None)
+                lt = latent(h, J, D); pred = pred_fn(D)
+                store[(N_train, kind)][name].append((pred.mean(), lt.mean(), hamming_nn(D, S_train).mean(), len(np.unique(D, axis=0)) / len(D)))
+    ADDITIVE = False
+    print(f"natural-like training sequences have mean latent fitness {np.mean(train_mean):.1f} (400 sequences)\n")
+    print("surrogate                          training sequences   held-out R^2   design setting                                      surrogate's prediction   TRUE fitness   gap (pred - true)   distance to nearest training seq.   fraction unique")
+    names = {"pair": "pairwise ridge", "add": "additive ridge (misspecified)", "mlp": "MLP, 2 hidden layers (flexible)"}
+    for c in configs:
+        for name, _, _ in settings:
+            if not store[c][name]: continue
+            a = np.mean(store[c][name], 0)
+            print(f"{names[c[1]]:33s}  {c[0]:8d}            {np.mean(heldout[c]):6.2f}        {name:50s}  {a[0]:9.2f}               {a[1]:8.2f}       {a[0]-a[1]:8.2f}            {a[2]:8.1f}                {a[3]:8.2f}")
