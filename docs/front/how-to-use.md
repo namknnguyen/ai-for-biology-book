@@ -21,6 +21,7 @@ The book deliberately does **not** spend its pages evenly.
 Every chapter uses a small set of devices. Learn to recognize them.
 
 !!! example "Worked Research Example"
+    **A note on realism.** The *situations* in these examples are stylized composites built to expose a reasoning pattern; their numbers (an AUROC, an $R^2$, a hit rate) are illustrative unless the text attributes them to a cited paper or to a simulation whose code is included in the book. The *reasoning*, and the quantities computed by the included code, are the substance.
     These replace the usual exercise sets. Each one states a research situation, then **walks through the reasoning** (what does the objective teach? what information is available? what is missing? which alternative explanations exist? which experiments distinguish them?), and only then gives the expert analysis. Early examples teach basic scientific reasoning; late ones resemble real research problems; the last ones have no known answer. *Try to write your own answer before reading the walkthrough.* That is the exercise.
 
 !!! notebook "Researcher's Notebook"
