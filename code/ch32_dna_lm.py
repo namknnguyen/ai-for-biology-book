@@ -40,7 +40,7 @@ tu, tl = arr[TEST_U[0]:TEST_U[1]], arr[TEST_LEAK[0]:TEST_LEAK[1]]
 for k in (2, 4, 6, 8): print(f"order-{k} Markov, RC augmentation          {markov_bits(mk[k], tu, k):8.3f}              {markov_bits(mk[k], tl, k):8.3f}")
 
 # ------------------------------------------------------------ a small causal transformer LM over nucleotides
-CTX = 192
+CTX = 128
 class Block(nn.Module):
     def __init__(self, d, h):
         super().__init__(); self.ln1 = nn.LayerNorm(d); self.att = nn.MultiheadAttention(d, h, batch_first=True); self.ln2 = nn.LayerNorm(d)
@@ -48,7 +48,7 @@ class Block(nn.Module):
     def forward(self, x, mask):
         h = self.ln1(x); x = x + self.att(h, h, h, attn_mask=mask, need_weights=False)[0]; return x + self.ff(self.ln2(x))
 class DNALM(nn.Module):
-    def __init__(self, d=96, h=4, nl=3):
+    def __init__(self, d=64, h=4, nl=3):
         super().__init__(); self.emb = nn.Embedding(5, d); self.pos = nn.Embedding(CTX, d); self.blocks = nn.ModuleList([Block(d, h) for _ in range(nl)])
         self.ln = nn.LayerNorm(d); self.out = nn.Linear(d, 4)
     def forward(self, x):                                                       # x: (B, T) with a start token 4 prepended by the caller
@@ -64,11 +64,11 @@ def batch(B):
         if rng.random() < 0.5: w = rc_arr(w)                                    # reverse-complement augmentation
         xs.append(w)
     return torch.tensor(np.stack(xs))
-opt = torch.optim.AdamW(model.parameters(), 2e-3, weight_decay=0.01); steps = 3000
-sched = torch.optim.lr_scheduler.OneCycleLR(opt, 2e-3, total_steps=steps)
+opt = torch.optim.AdamW(model.parameters(), 3e-3, weight_decay=0.01); steps = 2500
+sched = torch.optim.lr_scheduler.OneCycleLR(opt, 3e-3, total_steps=steps)
 t0 = time.time()
 for st in range(steps):
-    x = batch(64); inp = torch.cat([torch.full((64, 1), 4), x[:, :-1]], 1)
+    x = batch(48); inp = torch.cat([torch.full((48, 1), 4), x[:, :-1]], 1)
     loss = F.cross_entropy(model(inp).reshape(-1, 4), x.reshape(-1)); opt.zero_grad(); loss.backward(); opt.step(); sched.step()
 print(f"trained {steps} steps in {time.time() - t0:.0f} s; final training loss {loss.item() / np.log(2):.3f} bits/base")
 model.eval()
@@ -104,6 +104,10 @@ for f in rec.features:
             gpos = s0 + j if strand == 1 else e0 - 1 - j; galt = b if strand == 1 else b.translate(comp)
             variants.append((gpos, "ACGT".index(galt), cls))
 print(f"{len(variants):,} single-nucleotide variants in held-out genes: " + ", ".join(f"{c} {sum(v[2]==c for v in variants):,}" for c in ("synonymous", "missense", "stop-gain")))
+sub = []                                                                    # score a stratified subsample: all stop-gain, 2,500 synonymous, 2,500 missense
+for c, k in (("stop-gain", None), ("synonymous", 2500), ("missense", 2500)):
+    pool = [v for v in variants if v[2] == c]; sub += pool if k is None else [pool[i] for i in rng.choice(len(pool), min(k, len(pool)), replace=False)]
+variants = sub; print(f"scoring a stratified subsample of {len(variants):,} variants")
 W = 48
 def window_logp_markov(a, k):
     c, nx = contexts(a, k); return mk[k][c, nx].sum() * 1.0
