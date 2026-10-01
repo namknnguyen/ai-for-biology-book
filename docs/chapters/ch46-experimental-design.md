@@ -35,9 +35,11 @@ Consider $y=X\beta+\varepsilon$, $\varepsilon\sim\mathcal N(0,\sigma^2I)$. The e
 (By the Kiefer–Wolfowitz equivalence theorem, D- and G-optimality coincide for continuous designs.)
 
 **The greedy rule and its guarantee.** Adding an experiment $x$ to a design with information matrix $M$ changes the log-determinant by
+
 $$
 \log\det(M+xx^\top/\sigma^2)-\log\det M=\log\big(1+x^\top M^{-1}x/\sigma^2\big),
 $$
+
 by the matrix determinant lemma. So the greedy D-optimal step is to add the candidate with the largest **leverage** $x^\top M^{-1}x$: the one the current design predicts worst. Since $\log\det$ is monotone and *submodular* in the set of experiments, the greedy design is within a factor $(1-1/e)$ of the optimum (Nemhauser et al., 1978; Krause et al., 2008) [[E]]. With a Gaussian prior $\beta\sim\mathcal N(0,\Sigma_0)$, the expected information gain of Chapter 56 is exactly $\tfrac12\log\det(I+\Sigma_0^{1/2}X^\top X\Sigma_0^{1/2}/\sigma^2)$, so **D-optimal design is expected-information-gain design for a linear Gaussian model**, and leverage-based selection is uncertainty sampling.
 
 **What the theory ignores**: nonlinearity (use local linearizations or Bayesian designs), model misspecification (leverage is wrong if the linear model is), the possibility that features are themselves uncertain (embeddings), and batch effects (§46.7). It nevertheless gives the right qualitative guidance: *measure where the current model is most uncertain, and cover the space.*

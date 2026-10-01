@@ -63,10 +63,12 @@ $$
 $$
 
 **Marginal distribution.** Integrating out $\lambda$,
+
 $$
 p(y)=\int_0^\infty\frac{\lambda^ye^{-\lambda}}{y!}\cdot\frac{\lambda^{r-1}e^{-\lambda r/\mu}}{\Gamma(r)(\mu/r)^r}\,d\lambda
 =\frac{\Gamma(y+r)}{y!\,\Gamma(r)}\Big(\frac{r}{r+\mu}\Big)^{r}\Big(\frac{\mu}{r+\mu}\Big)^{y},
 $$
+
 the negative binomial. The code at the end of the chapter verifies the variance formula numerically (observed 17.53 vs predicted 17.50 for $\mu=5$, $r=2$; Poisson alone would give 5).
 
 **Interpretation.** The parameter $1/r$ (the *dispersion*) measures how much the *true* rate varies from sample to sample. As $r\to\infty$, NB $\to$ Poisson. For bulk RNA-seq, biological replicates have genuine variation in true expression, so NB is standard (edgeR, DESeq2). For UMI-based single-cell data, much of the apparent overdispersion for a gene with a *single* cell type is small, but heterogeneity between cells (cell size, cell state, ambient RNA) reintroduces it. A frequently repeated claim that droplet scRNA-seq data are "zero-inflated" is largely contradicted by the observation that NB with appropriate means already predicts the observed zeros (Svensson, 2020) [[S]]; the *zero-inflated* variants in older methods mostly fit unmodeled biological heterogeneity. This matters for foundation-model design: whether the likelihood of a model is Gaussian on log-transformed counts, NB, or something else changes what it treats as "noise" (Chapters 30, 38).

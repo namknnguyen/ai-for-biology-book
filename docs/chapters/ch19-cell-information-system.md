@@ -137,17 +137,23 @@ Genes are not switched on and off like a light; they fire in **bursts**: the pro
 ### 19.5.1 Derivation: bursting gives the negative binomial
 
 Model: bursts arrive as a Poisson process at rate $k_b$; each burst produces a geometrically distributed number of mRNAs $B$ on $\{0,1,2,\dots\}$ with mean $b$ (probability generating function $H(z)=\E[z^B]=\dfrac1{1+b(1-z)}$); each mRNA degrades independently at rate $\gamma$. At steady state, the mRNA count is the number of molecules that survive from all past bursts. A burst at age $a$ contributes each of its molecules independently with probability $p(a)=e^{-\gamma a}$, so the *thinned* burst has pgf $H(1-p+pz)=\dfrac1{1+bp(1-z)}$. Because bursts are Poisson in time, the pgf of the total count is
+
 $$
 G(z)=\exp\Big(k_b\int_0^\infty\big[H(1-p(a)+p(a)z)-1\big]\,da\Big)=\exp\Big(k_b\int_0^\infty\frac{-q\,e^{-\gamma a}}{1+q\,e^{-\gamma a}}\,da\Big),\quad q=b(1-z).
 $$
+
 The integral equals $-\frac1\gamma\ln(1+q)$, so
+
 $$
 G(z)=\big(1+b(1-z)\big)^{-k_b/\gamma}.
 $$
+
 This is the pgf of a **negative binomial** with shape $r=k_b/\gamma$ and mean $\mu=rb$, with variance
+
 $$
 \mathrm{Var}=\mu(1+b)=\mu+\frac{\mu^2}{r}.
 $$
+
 (compare Chapter 4, §4.2.3: the Gamma–Poisson form with the same variance). The **Fano factor** (variance/mean) is $1+b$: *burst size* sets the overdispersion, *burst frequency relative to decay* sets $r$ (the inverse dispersion). A constitutively expressed gene (no bursting, $b\to0$) is Poisson with Fano factor 1.
 
 **Simulation** (`code/ch19_cell_dynamics.py`): $k_b=0.2\ \text{min}^{-1}$, $b=8$, $\gamma=0.1\ \text{min}^{-1}$, so $r=2$ and $\mu=16$. From 4,000 simulated cells: mean $15.85$ (theory $16.0$), variance $141.8$ (theory $144.0$), Fano factor $8.95$ (theory 9.0), and a moment-matched NB fit gives $r=1.99$ (theory 2.00). A Poisson gene with the same mean has Fano factor $0.99$. **The overdispersion in single-cell count data is therefore partly *biological* (bursting) and partly technical (capture heterogeneity), and the NB likelihood is the natural model for both** (Chapters 4, 25, 30).
@@ -162,17 +168,21 @@ $$
 ### 19.6.1 The regulatory network as a dynamical system
 
 Genes regulate each other: transcription factors (proteins) activate or repress targets, including other TFs. Writing $x_g$ for the concentration of gene product $g$, a minimal ODE model is
+
 $$
 \frac{dx_g}{dt}=f_g(\mathbf{x})-\gamma_gx_g,
 $$
+
 where the production function $f_g$ encodes regulatory logic (Hill functions of TF concentrations; Chapter 22) and $\gamma_g$ is the degradation/dilution rate. A **cell state** is then a point $\mathbf{x}$ in this space; a **stable cell type** is an **attractor**: a state that the dynamics return to after small perturbations (Kauffman, 1969; Huang et al., 2005). **Differentiation** is a trajectory from one attractor basin to another; **Waddington's landscape** is the metaphor, with valleys as attractors and ridges as barriers.
 
 ### 19.6.2 A minimal example: the genetic toggle switch
 
 Two genes that repress each other (Gardner, Cantor & Collins, 2000):
+
 $$
 \frac{du}{dt}=\frac{a}{1+v^n}-u,\qquad\frac{dv}{dt}=\frac{a}{1+u^n}-v .
 $$
+
 For $n=2$: if the maximal production rate $a$ is small, there is one stable state with $u=v$ (both moderately expressed); if $a$ is large enough, mutual repression produces **bistability**. The code finds fixed points by Newton iteration and classifies them by the Jacobian: for $a=1.5$, a single stable state $(0.86,0.86)$; for $a=3$, two stable states $(u=0.38,v=2.62)$ and $(2.62,0.38)$ plus an unstable saddle $(1.21,1.21)$ between them. *Two cell types from one regulatory architecture*, with the unstable symmetric state as the "ridge."
 
 **Noise-driven switching.** With additive noise of standard deviation $\sigma$ the system occasionally crosses the barrier. The number of *committed* switches (clear transitions to the other state) in 4,000 time units rises steeply with noise: 23 at $\sigma=0.3$, 158 at $0.6$, and 471 at $0.9$. Therefore **cell states are robust but not permanent**: stochastic fluctuations (Section 19.5) can cause spontaneous transitions, which is thought to underlie phenomena such as heterogeneity in drug response and stem-cell state interconversion.

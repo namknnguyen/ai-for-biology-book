@@ -182,9 +182,11 @@ Across genes, mRNA abundance explains only a *moderate* fraction (order 40–50%
 ### 22.7.1 The cis/trans decomposition
 
 For gene $g$ in cell type (or state) $t$, write expression as
+
 $$
 y_{g,t}=F\big(\mathbf{s}_g;\ \boldsymbol\tau_t\big)+\varepsilon_{g,t},
 $$
+
 where $\mathbf{s}_g$ is the **cis** sequence (promoter, enhancers, gene body, UTRs) and $\boldsymbol\tau_t$ is the **trans** state (the concentrations and activities of TFs and cofactors, chromatin remodelers, RNA-binding proteins). The same cis sequence gives different outputs in different cells because $\boldsymbol\tau_t$ differs; the same trans state gives different outputs for different genes because $\mathbf{s}_g$ differs. This is the formal version of "one genome, hundreds of cell types."
 
 **Consequences for models.**

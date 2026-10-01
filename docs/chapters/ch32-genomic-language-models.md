@@ -10,9 +10,11 @@
 ## 32.0 What a likelihood means in a genome
 
 A genomic language model assigns a probability $p_\theta(x_{1:L})$ to a DNA sequence. Written autoregressively,
+
 $$
 \log p_\theta(x_{1:L})=\sum_{t=1}^{L}\log p_\theta(x_t\mid x_{<t}),\qquad \text{cross-entropy per base}=-\tfrac1L\log_2 p_\theta(x_{1:L})\ \text{bits}.
 $$
+
 Two properties of DNA make this unlike natural language (Chapters 5 and 28):
 
 1. **Most of a genome is close to incompressible by local context.** Non-repetitive DNA has an entropy of about 1.9 bits per base under good local models (the maximum is 2), so a model's room for improvement over a simple Markov chain is a few hundredths of a bit; the signal for function lives in that margin.
@@ -115,9 +117,11 @@ This is the same trap as Chapter 20 (a frequency-based score confounding mutatio
 ## 32.3 Zero-shot variant effects: when does the likelihood ratio work?
 
 The zero-shot score of a variant is a log-likelihood ratio (LLR),
+
 $$
 \text{LLR}(v)=\log p_\theta(x^{\text{alt}})-\log p_\theta(x^{\text{ref}}).
 $$
+
 For a model trained on *many sequences from related organisms* it approximates a log-odds of the alternative allele being tolerated *given the evolutionary context*. Formally, if the training distribution is a mixture of selected families, $p_\theta(x)\approx\sum_f\pi_f\,p_f(x)$ with $p_f$ a Potts-like energy-based model (Chapter 29), then a strongly constrained position has low probability for alternatives under every $p_f$ and a large negative LLR. The approximation breaks when (i) the model has memorized sequences instead of learning constraints, (ii) the context is too short to include the relevant covarying site, (iii) the position is neutral in the training species and constrained in the species of interest, or (iv) base composition or mutational biases dominate (§32.2).
 
 **What makes the LLR meaningful in practice.** (a) *Evolutionary breadth*: multi-species alignments (GPN-MSA, Benegas et al., *Nature Biotechnology* 2025, which feeds an alignment of 100 vertebrate genomes to a masked-language-model objective and reports outperforming CADD and the Nucleotide Transformer on several deleteriousness benchmarks while training in a few hours) or training on tens of thousands of species (Evo 2). (b) *Evaluation designed against confounds*: matched allele frequency, matched composition, held-out genes, and comparison with an explicit conservation baseline (phyloP, phastCons). A zero-shot LLR that does not beat a conservation score computed from the same species is not adding what the language model is claimed to add.

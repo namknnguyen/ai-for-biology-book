@@ -162,9 +162,11 @@ The simulation holds the score separation fixed so that AUROC $\approx0.90$ at a
 **Calibration.** A model is *calibrated* if events predicted with probability $q$ occur with frequency $q$. Reliability diagrams and the expected calibration error assess it; temperature scaling or isotonic regression repair it. Calibration matters whenever predictions feed decisions or Bayesian combination (Chapter 4's variant classification).
 
 **Between-group versus within-group correlation: the most important metric trap in genomics.** Let $y_{gi}$ be the expression of gene $g$ in individual $i$. Decompose the variance:
+
 $$
 \Var(y)=\underbrace{\Var_g(\bar y_g)}_{\text{between genes}}+\underbrace{\E_g[\Var_i(y_{gi}\mid g)]}_{\text{within genes, across individuals}} .
 $$
+
 Between-gene variation (housekeeping genes vs. tissue-specific genes; 10,000-fold range) is typically *orders of magnitude* larger than between-individual variation for the same gene. Take a predictor that knows each gene's mean *perfectly* and knows nothing about individuals. In the simulation (between-gene SD 2.0, within-gene SD 0.2) its Pearson correlation computed over all (gene, individual) pairs is **0.995**, but its **mean within-gene correlation across individuals is 0.000**. A model that predicts expression "with $r=0.8$" across genes may have $r\approx0$ for the question that matters for personal genomics and variant effects: *how does this person's expression of this gene differ from another person's?* This is not hypothetical: evaluations in 2023 found that state-of-the-art sequence-to-expression models explained little of between-individual variation in gene expression and often predicted the wrong *direction* of cis-genetic effects, despite high between-gene performance (Huang et al., 2023; Sasse et al., 2023; Chapter 31). The statistic must be matched to the *unit of the question*.
 
 ---

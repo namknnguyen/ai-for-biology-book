@@ -30,18 +30,23 @@
 Chapter 14 derived the VAE; Chapter 25 derived the count model. Their combination, **scVI** (Lopez et al., 2018) [[E]], is the dominant probabilistic model for single-cell counts.
 
 **Generative model.** For cell $n$ with batch label $s_n$ and observed library size $\ell_n=\sum_gy_{ng}$:
+
 $$
 z_n\sim\mathcal N(0,I_d),\qquad \rho_n=\mathrm{softmax}\big(f_\theta(z_n,s_n)\big)\in\Delta^{G-1},\qquad y_{ng}\mid z_n\sim\mathrm{NB}\big(\mu=\ell_n\rho_{ng},\ \text{inverse dispersion }\vartheta_g\big),
 $$
+
 with $f_\theta:\mathbb R^{d+S}\to\mathbb R^G$ a neural network, $d$ the latent dimension (typically 10–30), and $\vartheta_g$ learned per gene. The softmax encodes the compositional nature of the data (Chapter 25); multiplying by the observed library size handles capture efficiency. (The original model treats the library size as latent with a learned prior; fixing it to the observed value is a common simplification.) The NB log-likelihood per gene is
+
 $$
 \log\mathrm{NB}(y\mid\mu,\vartheta)=\log\Gamma(y+\vartheta)-\log\Gamma(\vartheta)-\log y!+\vartheta\log\frac{\vartheta}{\vartheta+\mu}+y\log\frac{\mu}{\vartheta+\mu}.
 $$
 
 **Inference.** An encoder $q_\phi(z\mid y)=\mathcal N\big(\mu_\phi(\log(1+y)),\mathrm{diag}\,\sigma^2_\phi\big)$ and the evidence lower bound (Chapter 8)
+
 $$
 \mathcal L(\theta,\phi)=\mathbb E_{q_\phi(z\mid y)}\big[\log p_\theta(y\mid z,s)\big]-\mathrm{KL}\big(q_\phi(z\mid y)\,\Vert\,\mathcal N(0,I)\big),
 $$
+
 optimized by minibatch SGD with the reparameterization trick $z=\mu_\phi+\sigma_\phi\odot\varepsilon$. **Tensor shapes:** for a minibatch of $B$ cells, $y\in\mathbb N^{B\times G}$; encoder $B\times G\to B\times h\to B\times d$ (two heads, mean and log-variance); decoder $B\times(d+S)\to B\times h\to B\times G$ (logits); $\mu=\ell\cdot\mathrm{softmax}(\text{logits})$ is $B\times G$. The cost per minibatch is $O\big(Bh(G+d)\big)$ with $h\sim128$–$512$: dominated by the first and last layers, which is why $G$ is restricted to a few thousand highly variable genes.
 
 **What the latent variable and the output mean.** The posterior mean $\mathbb E[z\mid y]$ is a *representation* of the cell with the count noise removed by construction; $\mathbb E[\rho\mid y]$ is a **denoised** expression estimate. Both are *model outputs*, not measurements: the denoising borrows strength across genes through the shared latent code, so it also *introduces dependence between genes* (§30.7). Differential expression can be done by comparing $\rho$ under two conditions, with Bayes factors derived from posterior samples; this inherits the replicate issue of Chapter 25 (cells are not independent). Extensions: scANVI (semi-supervised with labels), totalVI (RNA plus protein), and multi-omic models (Chapter 40).

@@ -23,24 +23,32 @@ A protein sequence is the end product of selection for a function, and a *family
 ## 34.1 The objective, and its relation to the Potts model
 
 **Masked language modeling (MLM).** Select a fraction of positions $M$ (typically 15%), replace them with a mask token, and minimize
+
 $$
 \mathcal L_\text{MLM}(\theta)=-\mathbb E_{x\sim p_\text{data}}\ \mathbb E_{M}\ \sum_{i\in M}\log p_\theta\big(x_i\mid x_{\setminus M}\big).
 $$
+
 Examples: ESM-1b (Rives et al., 2021; 650M parameters on UniRef50), ESM-1v (Meier et al., 2021; a variant-effect-oriented ensemble), and ESM-2 (Lin et al., 2023; 8M to 15B parameters). **Autoregressive** pLMs (ProGen, Madani et al.; ProGen2, Nijkamp et al.; ProtGPT2) maximize $\sum_i\log p_\theta(x_i\mid x_{<i})$ and generate by sampling; **encoder-decoder or masked-span** variants and **conditional** models (family-conditioned: PoET, Truong and Bepler 2023, which conditions on an MSA-like set of homologs in context) exist. **Multimodal** pLMs (ESM3, Hayes et al., *Science* 2025) predict tokens of sequence, structure, and function jointly, so a prompt can be partial in any modality.
 
 !!! math "Derivation: the zero-shot mutation score is a Potts energy difference"
     Suppose the data are drawn from a Potts model $p(x)\propto\exp\!\big(\sum_ih_i(x_i)+\sum_{i<j}J_{ij}(x_i,x_j)\big)$ (Chapter 29). Its single-site conditional is exactly a softmax,
+
     $$
     p(x_i=a\mid x_{\setminus i})=\softmax_a\Big(h_i(a)+\sum_{j\ne i}J_{ij}(a,x_j)\Big).
     $$
+
     An MLM with infinite capacity and enough data learns precisely this conditional (the true conditionals of the data distribution minimize the cross-entropy). For a single mutation at position $i$ from the wild-type residue $a$ to $b$, define the **masked-marginal log-likelihood ratio**
+
     $$
     \text{LLR}(a\to b)=\log p_\theta(x_i=b\mid x_{\setminus i})-\log p_\theta(x_i=a\mid x_{\setminus i}).
     $$
+
     The normalizing constant cancels, giving
+
     $$
     \text{LLR}(a\to b)=\big[h_i(b)-h_i(a)\big]+\sum_{j\ne i}\big[J_{ij}(b,x_j)-J_{ij}(a,x_j)\big]=\Delta\!\log\tilde p(x),
     $$
+
     the *exact* change in the unnormalized log-probability of the whole sequence, i.e., minus the Potts energy difference $\Delta E$. The masked conditional therefore recovers the energy change of a *single* substitution *without computing the partition function*; multiple substitutions need the joint and require either the autoregressive likelihood or an approximation (summing masked marginals, which ignores the interactions among the mutations). $\square$
 
 !!! rhyme "Structural rhyme: masked language model ↔ pseudolikelihood ↔ site-wise logistic regression (Chapter 29)"

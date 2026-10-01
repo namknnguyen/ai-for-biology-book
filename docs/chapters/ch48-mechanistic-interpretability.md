@@ -34,9 +34,11 @@ The consequence is a stricter standard: *an interpretation is a hypothesis that 
 **Causal abstraction and interchange interventions.** If the model implements a high-level algorithm with variables (e.g., "motif A present", "motif B present", "AND"), then swapping the model's internal representation of "A present" between two inputs should change the output as the algorithm predicts. Passing the interchange test for all variables supports I4 (Geiger et al. 2021, 2023).
 
 **Sparse autoencoders and superposition.** If a model represents more features than it has dimensions, it can *superpose* them in near-orthogonal directions, exploiting the fact that features are rarely active together (Elhage et al. 2022). A sparse autoencoder (SAE) trains a dictionary to reconstruct activations from sparse combinations of learned directions,
+
 $$
 \hat h=D f(h),\quad f(h)=\mathrm{ReLU}(Eh+b),\qquad \mathcal L=\|h-\hat h\|_2^2+\lambda\|f(h)\|_1,
 $$
+
 with $f\in\mathbb R^{m}$ and $m>\dim h$, in the hope that each latent corresponds to one human-interpretable feature (Bricken et al. 2023; Templeton et al. 2024). The assumptions are strong: features are approximately *linear directions*, *sparsely active*, and recoverable by this optimization; none is guaranteed, and the objective has many near-equivalent solutions (feature splitting at larger $m$; absorption of general features by specific ones).
 
 !!! math "Derivation: why superposition is possible for sparse features"

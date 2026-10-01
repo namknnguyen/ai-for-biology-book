@@ -25,9 +25,11 @@ The unifying statement is that each classical model is a **probabilistic model w
 ### 29.2.1 Derivation
 
 Let $\{x^{(n)}\}$ be $N$ aligned binding sites of width $w$ over $\{A,C,G,T\}$. The **independent-sites model** assumes position $j$ has its own base distribution $P_{j}(b)$ and positions are independent, so $P(x)=\prod_jP_j(x_j)$. The maximum-likelihood estimate is the column frequency $\hat P_j(b)=n_{jb}/N$, regularized with pseudocounts $\alpha$: $\hat P_j(b)=(n_{jb}+\alpha)/(N+4\alpha)$ (a Dirichlet prior; Chapter 4). Against a background distribution $B(b)$ (iid, or Markov), the log-likelihood ratio of a candidate site is
+
 $$
 S(x)=\sum_{j=1}^w\log_2\frac{\hat P_j(x_j)}{B(x_j)},
 $$
+
 the **PWM score** (also *position-specific scoring matrix*, PSSM). It is the log-odds that $x$ was drawn from the binding-site model rather than the background (a naive Bayes classifier with one feature per position). The expected score under the motif model is $\sum_j\mathrm{KL}(\hat P_j\Vert B)$, the **information content** of the motif in bits (Chapter 5; Schneider et al., 1986): CTCF (JASPAR matrix MA0139.1, 19 positions) has 17.1 bits, the TBP-like matrix MA0108.2 has 9.9 bits.
 
 !!! rhyme "Structural rhyme: the PWM ↔ an additive binding-energy model ↔ a one-layer convolution"
@@ -84,9 +86,11 @@ A protein family's sequences are not independent draws: positions that contact e
 ### 29.4.1 Maximum entropy and the Potts model
 
 Take $B$ aligned sequences $s^{(b)}\in\{1,\dots,q\}^L$ and compute single-site frequencies $f_i(a)$ and pair frequencies $f_{ij}(a,b)$. Among all distributions that reproduce these marginals, the one with maximum entropy (Jaynes, 1957) has the Gibbs form
+
 $$
 P(s)=\frac1Z\exp\Big(\sum_ih_i(s_i)+\sum_{i<j}J_{ij}(s_i,s_j)\Big),
 $$
+
 the **Potts model** (the $q=2$ case is the Ising model). The fields $h_i$ capture conservation, the couplings $J_{ij}$ the *direct* interactions. The central point: **correlation is not coupling**: positions $i$ and $k$ can be correlated because both couple to $j$ (a chain $i$–$j$–$k$), and the inverse problem of finding $J$ from the marginals, that is, *removing indirect correlations*, is what distinguishes DCA from simply computing mutual information (Weigt et al., 2009; Morcos et al., 2011).
 
 **Inference.** Exact maximum-likelihood needs $Z$ (intractable: $q^L$ terms). Two classical approximations: **mean-field DCA** ($J=-C^{-1}$, the inverse of the covariance matrix with pseudocount regularization; a single matrix inversion; Morcos et al., 2011) and **pseudolikelihood** maximization (plmDCA; Ekeberg et al., 2013), which maximizes $\sum_b\sum_r\log P(s^{(b)}_r\mid s^{(b)}_{\setminus r})$, a set of $L$ multinomial logistic regressions on the one-hot encoding of the other positions, with an $\ell_2$ penalty. The pair score is the Frobenius norm $\lVert J_{ij}\rVert_F$ in a zero-sum gauge, corrected by the average-product correction (APC; Dunn et al., 2008), which removes the background caused by phylogeny and conservation. **Sequence reweighting**: sequences with at least 80% identity to others are down-weighted by one over the cluster size, yielding $N_\text{eff}=\sum_b w_b$, the effective number of independent sequences (Chapter 23).

@@ -165,6 +165,7 @@ $$
 \mathbf{m}_t=\beta_1\mathbf{m}_{t-1}+(1-\beta_1)\mathbf{g}_t,\qquad
 \mathbf{v}_t=\beta_2\mathbf{v}_{t-1}+(1-\beta_2)\mathbf{g}_t^{\odot2},
 $$
+
 $$
 \hat{\mathbf{m}}_t=\frac{\mathbf{m}_t}{1-\beta_1^t},\quad
 \hat{\mathbf{v}}_t=\frac{\mathbf{v}_t}{1-\beta_2^t},\qquad

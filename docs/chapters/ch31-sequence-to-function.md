@@ -57,9 +57,11 @@ The newest models report improvements on variant-effect benchmarks (Borzoi on eQ
 ### 31.4.1 An identifiability argument
 
 Let $f_\theta$ be a model trained on pairs $(x_g,y_g)$, $g=1,\dots,G$, where $x_g$ are reference sequences at different loci (so one example per locus). Suppose the true function is additive in the features of the sequence, $y=\sum_k\beta_k\phi_k(x)+\varepsilon$, with $\phi_k(x)\in\{0,1\}$ indicating the presence of motif $k$. The effect of destroying motif $k$ at a locus is $-\beta_k$: a *counterfactual*, the change in $y$ when only $\phi_k$ changes. From the data, $\beta$ is estimated by regression, and **$\beta_k$ is identified only if $\phi_k$ varies independently of the other features**. For two features $a,b$ with correlation $\rho_{ab}$, the least-squares variance of $\hat\beta_A$ is
+
 $$
 \Var(\hat\beta_A)=\frac{\sigma^2}{n\,\Var(a)\,(1-\rho_{ab}^2)},
 $$
+
 inflated by the **variance inflation factor** $1/(1-\rho_{ab}^2)$: 2.8 at $\rho_{ab}=0.8$, 25 at $0.98$, and infinite at $\rho_{ab}=1$, where only the sum $\beta_A+\beta_B$ is identified. A flexible model with an implicit bias (minimum-norm, early stopping, weight decay) resolves the ambiguity *arbitrarily*, by splitting the identified sum according to its inductive bias: a regression with $a\equiv b$ and $\beta_A+\beta_B=0.2$ returns $\hat\beta_A=\hat\beta_B=0.1$ under the minimum-norm solution, predicting that deleting the repressor $B$ *lowers* expression when it truly raises it.
 
 **In genomics the features are correlated:** motifs of cooperating TFs co-occur in composite elements; promoter and enhancer strengths co-vary; GC content, repeat class, and chromatin context correlate with many motifs; LD ties variants together (Chapter 26). The model is *accurate on the training distribution* because it learns the identified combination, and *unconstrained along the directions the data never separate*, which are exactly the directions that a single-nucleotide edit (destroying one half of a composite element) moves along. This is **a failure of identification in the data, not of the architecture or optimizer**: a larger model fits the same combination.

@@ -30,24 +30,32 @@ Each arrow can be *measured* or *predicted*, and each prediction has a ceiling (
 ## 41.1 Fine-mapping with a functional prior
 
 **Setup.** At a GWAS locus with $M$ variants in LD and one causal variant, let $z_j$ be the z-score of variant $j$ and $s_j$ an annotation. Under the single-causal-variant model with Gaussian effects of prior variance $W$, Wakefield's approximate Bayes factor for variant $j$ being the causal one, relative to the null, is
+
 $$
 \mathrm{ABF}_j=\sqrt{\frac{V}{V+W}}\exp\!\Big(\frac{z_j^2}{2}\,\frac{W}{V+W}\Big),\qquad V=\tfrac{1}{n}\ \text{(approximately, for standardized genotypes)}.
 $$
+
 With a prior probability $\pi_j$ that variant $j$ is the causal one, the **posterior inclusion probability** (PIP) is
+
 $$
 \mathrm{PIP}_j=\frac{\pi_j\,\mathrm{ABF}_j}{\sum_k\pi_k\,\mathrm{ABF}_k}.
 $$
+
 With a uniform prior $\pi_j=1/M$ the posterior is driven only by $z$; with an annotation prior, a variant with a large annotation and a moderate $z$ can outrank an unannotated variant in perfect LD with it.
 
 !!! math "Derivation: what an annotation is worth as a likelihood ratio"
     Suppose the annotation is a score $s_j\sim\mathcal N(\mu c_j,1)$, where $c_j=1$ if variant $j$ is causal and 0 otherwise. The likelihood ratio that a variant with score $s$ is causal versus not is
+
     $$
     \mathrm{LR}(s)=\frac{\phi(s-\mu)}{\phi(s)}=\exp\!\big(\mu s-\tfrac12\mu^2\big),
     $$
+
     so the *Bayes-optimal* prior weights are $\pi_j\propto\exp(\mu s_j)$ (up to a constant), a log-linear prior with slope $\mu$. The annotation's separating power is summarized by the AUROC for causal versus non-causal variants,
+
     $$
     \mathrm{AUROC}=\Phi\!\big(\mu/\sqrt2\big)\quad(\mu=0\Rightarrow0.50;\ \mu=1\Rightarrow0.76;\ \mu=2\Rightarrow0.92;\ \mu=3\Rightarrow0.98).
     $$
+
     If the analyst assumes a slope $\gamma\neq\mu$, the prior is mis-specified: $\gamma<\mu$ wastes information; $\gamma>\mu$ over-weights the annotation and, when it is wrong (the causal variant has a low score), pushes the posterior mass onto variants that look functional, which *reduces coverage* of the credible set. $\square$
 
 **Simulation (Part 1).** 100 variants in a single LD block (within-block correlation drawn uniformly from 0.3 to 0.95), one causal variant explaining 1% of variance, $n=5{,}000$; 3,000 loci per row. The annotation has AUROC 0.50, 0.76, 0.92, or 0.98; the prior is uniform, correct ($\gamma=\mu$), or twice too confident ($\gamma=2\mu$).
@@ -99,9 +107,11 @@ TypeError: LassoCV.__init__() got an unexpected keyword argument 'n_alphas'
 ## 41.2 Polygenic prediction with functionally informed shrinkage
 
 A polygenic score predicts $y=X\beta+\varepsilon$ by estimating $\beta$ from a training cohort. With a Gaussian prior $\beta_j\sim\mathcal N(0,\tau^2w_j)$ the posterior-mean estimator is a weighted ridge regression,
+
 $$
 \hat\beta=W^{1/2}\big(W^{1/2}X^\top XW^{1/2}+\lambda I\big)^{-1}W^{1/2}X^\top y,\qquad \lambda=\sigma^2/\tau^2,\ W=\mathrm{diag}(w_j),
 $$
+
 which, with $w_j\equiv1$, is the best linear unbiased predictor of the linear mixed model (Chapter 26). An annotation enters through $w_j$: variants with high annotation scores are allowed larger effects. With the Bayes-optimal weights $w_j\propto\mathrm{LR}(s_j)=e^{\mu s_j-\mu^2/2}$ (normalized to mean 1) the estimator uses the annotation as the log-linear prior of §41.1.
 
 **Simulation (Part 2).** 2,000 variants in 20 LD blocks, 40 causal variants, heritability 0.4; annotation AUROC 0.50, 0.76, 0.92, 0.98; training sizes 1,000 and 3,000 individuals; test $R^2$ in 4,000 held-out individuals (mean of six repetitions). Methods: uniform ridge (the mixed-model predictor), annotation-informed ridge, and the same with a prior that is twice too confident. The upper bound is the heritability, 0.40.

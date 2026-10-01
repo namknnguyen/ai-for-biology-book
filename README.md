@@ -3,7 +3,8 @@
 A research-training textbook that takes a reader from beginner to independent researcher at the intersection of
 deep learning, genomics, protein science, single-cell biology, drug discovery, and AI for science.
 
-**Read it online:** <https://namknnguyen.github.io/ai-for-biology-book/>
+**Read it online:** <https://namknnguyen.github.io/ai-for-biology-book/>  
+**PDF edition (462 pages):** [`docs/assets/ai-for-biology-book.pdf`](docs/assets/ai-for-biology-book.pdf)
 
 The book is organized as ten parts: orientation, mathematical foundations, core machine learning, deep learning,
 biology for modeling, computational biology, biological foundation models, research methodology, the frontier,
@@ -17,6 +18,19 @@ pip install -r requirements.txt
 mkdocs serve          # live preview at http://127.0.0.1:8000
 mkdocs build --strict # what CI runs
 ```
+
+## Building the PDF
+
+```bash
+pip install -r requirements.txt -r tools/requirements-pdf.txt
+npm install mathjax@3 mermaid@11            # MathJax and Mermaid are served locally while rendering
+python tools/build_pdf.py node_modules docs/assets/ai-for-biology-book.pdf
+```
+
+`tools/build_pdf.py` builds a single-page print version (`mkdocs-pdf.yml`), typesets every equation and
+diagram in headless Chromium, adds a cover, page numbers, bookmarks, and a contents list with page numbers.
+`tools/fix_display_math.py` keeps `$$` display-math fences separated by blank lines, which the Markdown
+parser needs in order to recognize them as equations.
 
 ## Running the book's code
 

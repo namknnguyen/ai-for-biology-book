@@ -49,16 +49,20 @@ with fitted constants $A,B,\alpha,\beta>0$. Three terms, each with meaning:
 ### 17.2.2 Compute-optimal allocation, derived
 
 Training compute is $C=6ND$ (Chapter 6). For a fixed budget $C$, which split of parameters and tokens minimizes the loss? Minimize $L(N,D)$ subject to $6ND=C$. Setting the gradient of the Lagrangian $L+\lambda(6ND-C)$ to zero:
+
 $$
 \frac{\partial L}{\partial N}=-\alpha AN^{-\alpha-1}+6\lambda D=0,\qquad
 \frac{\partial L}{\partial D}=-\beta BD^{-\beta-1}+6\lambda N=0 .
 $$
+
 Multiply the first by $N$ and the second by $D$: $\alpha AN^{-\alpha}=6\lambda ND=\beta BD^{-\beta}$. Hence **at the optimum the two reducible-loss terms are in fixed ratio**, $\alpha AN^{-\alpha}=\beta BD^{-\beta}$, so $D\propto N^{\alpha/\beta}$. Combined with $C=6ND$:
+
 $$
 N_\text{opt}=G\Big(\frac{C}{6}\Big)^{\beta/(\alpha+\beta)},\qquad
 D_\text{opt}=G^{-1}\Big(\frac{C}{6}\Big)^{\alpha/(\alpha+\beta)},\qquad
 G=\Big(\frac{\alpha A}{\beta B}\Big)^{1/(\alpha+\beta)} .
 $$
+
 **Both parameters and tokens should grow with compute at comparable rates** (for $\alpha\approx\beta$, as $C^{0.5}$ each). The finding of Hoffmann et al. (2022) that contemporary large models were *under-trained* (too many parameters for their token count) follows from this. The code evaluates the closed form against numerical minimization using constants of the form fitted for text ($E=1.69$, $A=406.4$, $B=410.7$, $\alpha=0.34$, $\beta=0.28$; **illustrative only**, since subsequent replication attempts have questioned the original fit): the closed form and numerical optimum agree (e.g., $N=1.82\times10^9$ and $D=9.1\times10^{10}$ at $C=10^{21}$), with exponents $N\propto C^{0.45}$, $D\propto C^{0.55}$ and a **tokens-per-parameter ratio of 50–78** for these constants. The widely quoted "20 tokens per parameter" is a *fitted* quantity that depends on the constants and drifts with scale; for biological data the constants are unknown and must be measured (Chapter 47).
 
 ### 17.2.3 Extrapolating scaling curves: why the irreducible term matters
@@ -130,9 +134,11 @@ These facts suggest replacing "$D$ = tokens" by an *effective number of independ
 ### 17.3.1 LoRA: derivation and properties
 
 **Low-rank adaptation** (Hu et al., 2022) freezes a pretrained weight $\mathbf{W}\in\R^{d_\text{out}\times d_\text{in}}$ and learns an additive update constrained to low rank:
+
 $$
 \mathbf{W}'=\mathbf{W}+\frac{\alpha}{r}\,\mathbf{B}\mathbf{A},\qquad\mathbf{B}\in\R^{d_\text{out}\times r},\ \mathbf{A}\in\R^{r\times d_\text{in}},\ r\ll\min(d_\text{in},d_\text{out}).
 $$
+
 $\mathbf{B}$ is initialized to zero (so the adapted model equals the pretrained one at initialization) and $\mathbf{A}$ randomly. The update has **rank at most $r$** and requires $r(d_\text{in}+d_\text{out})$ parameters instead of $d_\text{in}d_\text{out}$: for $d=512$, $r=8$ that is $8{,}192$ versus $262{,}144$ (3.1%). The code verifies the three properties: identical function at initialization, update rank exactly 8, and the parameter count. The method rests on the empirical observation that *task-specific weight changes have low intrinsic rank* (Aghajanyan et al., 2021). [[S]] In biology LoRA is the standard way to adapt large protein and DNA models to small assay datasets, and it permits storing many task-specific adapters per base model.
 
 ### 17.3.2 Fine-tuning can destroy what pretraining gave you
@@ -153,9 +159,11 @@ $$
 
 !!! math "Derivation: the KL-regularized optimum is a Boltzmann reweighting of the prior"
     Define $\pi^\star(x)=\pi_0(x)\,e^{r(x)/\beta}/Z$ with $Z=\sum_x\pi_0(x)e^{r(x)/\beta}$. For any distribution $\pi$,
+
     $$
     \E_\pi[r]-\beta\KL{\pi}{\pi_0}=\E_\pi\Big[r-\beta\log\frac{\pi}{\pi_0}\Big]=\E_\pi\Big[\beta\log\frac{\pi_0e^{r/\beta}}{\pi}\Big]=\beta\log Z-\beta\KL{\pi}{\pi^\star}.
     $$
+
     Since $\KL{\pi}{\pi^\star}\ge0$ with equality iff $\pi=\pi^\star$ (Chapter 5), the objective is maximized by $\pi^\star$, and the maximum value is $\beta\log Z$. $\square$
 
 The code confirms this on a six-outcome distribution: the numerically optimized policy matches $\pi_0e^{r/\beta}/Z$ to within $3\times10^{-5}$ for $\beta\in\{0.2,1,5\}$. As $\beta$ falls the policy moves farther from the prior (KL $=1.800$ at $\beta=0.2$ vs. $0.016$ at $\beta=5$) and its expected reward rises (1.936 vs. 0.260; prior 0.103). **$\beta$ is a temperature that trades reward against fidelity to the prior.**
@@ -178,17 +186,21 @@ The code confirms this on a six-outcome distribution: the numerically optimized 
 Chapter 1 asserted that "pretraining objective ≠ target capability". We can now say what *is* guaranteed.
 
 Let $x$ be the input, $z$ the pretraining target (the masked token, the next token, the paired view), and $y$ any downstream variable. Define the **pretraining sufficient statistic**
+
 $$
 s_\text{pre}(x)\ :=\ \big(\text{minimal statistic with }p(z\mid x)=p(z\mid s_\text{pre}(x))\big),
 $$
+
 the information in $x$ that bears on the pretraining target. A model that minimizes the pretraining loss to its optimum must output predictions that are functions of $s_\text{pre}(x)$, and so its representation $h$ must retain $s_\text{pre}(x)$ (otherwise it could not produce $p(z\mid x)$). Therefore, by the data-processing inequality in one direction and the retention requirement in the other:
 
 > **Sufficiency guarantee.** For any downstream $y$, a perfectly pretrained representation contains at least $\MI\big(s_\text{pre}(x);y\big)$ nats about $y$, and **everything beyond that is not guaranteed**: it is present only by the capacity and inductive bias of the network (accidental retention).
 
 Conversely, the representation can contain *at most* $\MI(x;y)$ (Chapter 5). So
+
 $$
 \MI\big(s_\text{pre}(x);y\big)\ \le\ \MI(h;y)\ \le\ \MI(x;y).
 $$
+
 The **objective gap** for a task $y$ is the *width of this interval* in the worst case: $\MI(x;y)-\MI(s_\text{pre}(x);y)$. It is *zero* when the pretraining target already determines $y$ given $x$ (e.g., if $y$ is a function of the model's own predictive distribution: zero-shot scoring) and *large* when $y$ depends on variables or structure that the pretraining target neither uses nor depends on.
 
 **A taxonomy of objective gaps for biological foundation models**, each a way $y$ can fall outside $s_\text{pre}(x)$:

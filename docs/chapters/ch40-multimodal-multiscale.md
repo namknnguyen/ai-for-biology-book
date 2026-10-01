@@ -10,9 +10,11 @@
 ## 40.0 Why more than one view
 
 **Measurement operators.** Each modality $k$ is a different operator $M_k$ applied to the cell's state $s$ (Chapter 25):
+
 $$
 x^{(k)}=M_k(s)+\varepsilon_k,\qquad k=1,\dots,K.
 $$
+
 RNA is a sampled, noisy readout of transcripts; accessibility reads the chromatin state; surface proteins read a different layer of the system; images read morphology; spatial positions read the neighborhood. No single $M_k$ is invertible; together they constrain $s$ more.
 
 **Scales.** The scales of biology (molecule, complex, pathway, cell, tissue, organism, population) each have their own models; *multi-scale* modeling couples them: molecular simulations feed kinetic parameters to cell models; cell models feed tissue models; images and genomes feed clinical models.
@@ -25,22 +27,28 @@ RNA is a sampled, noisy readout of transcripts; accessibility reads the chromati
 ## 40.1 Shared and private structure, and the information accounting
 
 **A latent model.** Let a cell have a shared latent $z_0$ and private latents $z_1,z_2$:
+
 $$
 x^{(1)}=f_1(z_0,z_1)+\varepsilon_1,\qquad x^{(2)}=f_2(z_0,z_2)+\varepsilon_2.
 $$
+
 The mutual information between modalities is carried by $z_0$: $I(x^{(1)};x^{(2)})\le I(z_0;\,x^{(1)})$, with equality only if $z_0$ is recoverable from each modality alone. Everything else, the private parts $z_1,z_2$, may predict *other* targets (cell type, state, disease) but cannot help *cross-modal* prediction.
 
 **Classical methods.** *CCA* finds linear projections $a^\top x^{(1)}$, $b^\top x^{(2)}$ of maximal correlation (it estimates the shared subspace if the relation is linear); *PLS* maximizes covariance; *MOFA/JIVE* decompose each modality into shared and individual factors; *multimodal VAEs* (totalVI for RNA and protein, MultiVI for RNA and chromatin; MVAE with product of experts; mixture-of-experts variants) put a joint latent over modalities; *GLUE* uses prior knowledge (a regulatory graph linking peaks to genes) to align unpaired modalities.
 
 !!! math "Derivation: the contrastive (InfoNCE) objective bounds the shared information"
     A dual-encoder model embeds paired observations $(x,y)$ as $(u,v)=(f(x),g(y))$ and trains with the InfoNCE loss over a batch of $N$ pairs,
+
     $$
     \mathcal L_\text{NCE}=-\mathbb E\Big[\log\frac{e^{s(u_i,v_i)/\tau}}{\sum_{j=1}^{N}e^{s(u_i,v_j)/\tau}}\Big],
     $$
+
     with similarity $s$ (cosine) and temperature $\tau$. Then (van den Oord et al. 2018)
+
     $$
     I(u;v)\;\ge\;\log N-\mathcal L_\text{NCE},
     $$
+
     and since $u$ and $v$ are functions of $x$ and $y$ respectively, $I(u;v)\le I(x;y)$ (data processing, Chapter 5). The bound cannot exceed $\log N$ (a larger batch is needed to certify more shared information), and the optimum retains *only information common to the two views that helps discriminate pairs*. Private information that varies independently across the views contributes nothing to $I(x;y)$ and is therefore *not required* in $(u,v)$: the encoders are free to discard it, and the objective gives them a (weak) incentive to do so, because private variation is nuisance that makes matching harder. $\square$
 
 **Consequence.** A CLIP-style alignment of RNA and chromatin will produce an embedding that supports cross-modal retrieval and the *shared* variation (cell type to the extent both modalities see it), and will discard information specific to one modality that may matter for the task at hand (a chromatin-only regulatory state; an RNA-only transient program). Whether that is a feature or a bug depends on the task.

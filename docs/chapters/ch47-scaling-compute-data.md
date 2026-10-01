@@ -10,9 +10,11 @@
 ## 47.0 What scales, and what is different about biology
 
 **The language-model picture.** For a model with $N$ parameters trained on $D$ tokens, the test loss follows approximately
+
 $$
 L(N,D)=E+\frac{A}{N^{\alpha}}+\frac{B}{D^{\beta}},
 $$
+
 with an irreducible term $E$ (the entropy of the data), and fitted exponents $\alpha,\beta\approx0.3$–$0.4$ (Kaplan et al. 2020; Hoffmann et al. 2022); for a fixed compute budget $C\approx6ND$ floating-point operations, the loss-minimizing allocation grows $N$ and $D$ together (Chapter 17). The regularity depends on the data being drawn i.i.d. from one distribution and on the evaluation being drawn from that same distribution.
 
 **What differs in biology.**
@@ -31,13 +33,17 @@ with an irreducible term $E$ (the entropy of the data), and fitted exponents $\a
 ## 47.1 Learning curves with floors
 
 Let a model trained on $n$ examples have test error (RMSE or loss)
+
 $$
 e(n)=c+a\,n^{-b},\qquad c=c_\text{noise}\oplus c_\text{shift}\oplus c_\text{bias},\quad a>0,\ 0<b\le1,
 $$
+
 where $c$ collects the irreducible parts: the measurement noise of the labels, the shift between train and test distributions, and the approximation bias of the model class. The marginal value of one more example is
+
 $$
 -\frac{de}{dn}=ab\,n^{-b-1},
 $$
+
 which decreases as $n^{-(1+b)}$; the number of examples needed to halve the *reducible* error $e-c$ is $n_{1/2}=n\,2^{1/b}$ (for $b=0.3$, a factor of about 10 per halving).
 
 !!! math "Derivation: fitting with an unknown floor can extrapolate through a known floor"
@@ -113,9 +119,11 @@ clusters used   training molecules   test RMSE (SE over 15 draws)
 ## 47.4 The economics of data
 
 The question for a funder or a lab is the *value per dollar* of one more unit of data of kind $k$:
+
 $$
 \text{value}_k=\frac{-\Delta e_k}{\text{cost}_k},
 $$
+
 the reduction in expected error on the target task divided by cost. Kinds differ.
 
 - **More of the same** (volume): diminishing returns as $n^{-(1+b)}$; the learning curve gives the value.

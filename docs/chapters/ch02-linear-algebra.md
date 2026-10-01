@@ -121,9 +121,11 @@ with orthonormal left singular vectors $\mathbf{u}_i\in\R^m$, orthonormal right 
 
 !!! math "Theorem (Eckart–Young–Mirsky) and proof sketch"
     Among all matrices $\mathbf{B}$ of rank at most $k$, the minimizer of $\|\mathbf{A}-\mathbf{B}\|_F$ is the truncated SVD $\mathbf{A}_k=\sum_{i=1}^k\sigma_i\mathbf{u}_i\mathbf{v}_i^\top$, and
+
     $$
     \min_{\rank\mathbf{B}\le k}\|\mathbf{A}-\mathbf{B}\|_F^2=\|\mathbf{A}-\mathbf{A}_k\|_F^2=\sum_{i>k}\sigma_i^2 .
     $$
+
     *Sketch (spectral-norm version).* $\|\mathbf{A}-\mathbf{A}_k\|_2=\sigma_{k+1}$. For any rank-$k$ matrix $\mathbf{B}$, its null space has dimension at least $n-k$, so it intersects the $(k+1)$-dimensional span of $\mathbf{v}_1,\dots,\mathbf{v}_{k+1}$ non-trivially; take a unit vector $\mathbf{z}$ in that intersection. Then $\|(\mathbf{A}-\mathbf{B})\mathbf{z}\|=\|\mathbf{A}\mathbf{z}\|\ge\sigma_{k+1}$ because $\mathbf{z}$ lies in the span of the top $k+1$ right singular vectors. Hence $\|\mathbf{A}-\mathbf{B}\|_2\ge\sigma_{k+1}$. The Frobenius case follows from a similar argument applied to each tail singular value (e.g., via Weyl's inequalities). $\square$
 
 Eckart–Young is the reason for the *rank-and-reconstruction-error* view of everything that follows: the squared error of the best rank-$k$ summary of a matrix is the sum of the squared singular values you throw away. The code below verifies the identity numerically.

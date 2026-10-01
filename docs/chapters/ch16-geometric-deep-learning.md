@@ -33,10 +33,12 @@ A **symmetry** of a problem is a transformation of the input that does not chang
 ### 16.2.1 Message passing
 
 A graph $G=(V,E)$ has node features $\mathbf{h}_i\in\R^d$ and optionally edge features $\mathbf{e}_{ij}$. A **message-passing neural network** (MPNN; Gilmer et al., 2017) updates each node by aggregating messages from its neighbors $\mathcal{N}(i)$:
+
 $$
 \mathbf{m}_i^{(\ell+1)}=\sum_{j\in\mathcal{N}(i)}\psi\big(\mathbf{h}_i^{(\ell)},\mathbf{h}_j^{(\ell)},\mathbf{e}_{ij}\big),\qquad
 \mathbf{h}_i^{(\ell+1)}=\phi\big(\mathbf{h}_i^{(\ell)},\mathbf{m}_i^{(\ell+1)}\big),
 $$
+
 with a graph-level **readout** $\hat y=R(\{\mathbf{h}_i^{(L)}\})$ that is permutation-invariant (sum, mean, max, or attention pooling).
 
 **Permutation equivariance.** If nodes are relabeled by a permutation matrix $\mathbf{P}$ (so $\mathbf{A}\to\mathbf{P}\mathbf{A}\mathbf{P}^\top$, $\mathbf{H}\to\mathbf{P}\mathbf{H}$), then $\mathbf{m}_i$ is a *sum over the same set of neighbors*, regardless of order; hence each layer maps $\mathbf{P}\mathbf{H}$ to $\mathbf{P}\mathbf{H}^{\text{new}}$. A sum readout is then invariant. The code verifies on a random 8-node graph and a 3-layer MPNN: equivariance error $6\times10^{-8}$, readout invariance error $1.2\times10^{-7}$ (float32 rounding).
@@ -44,9 +46,11 @@ with a graph-level **readout** $\hat y=R(\{\mathbf{h}_i^{(L)}\})$ that is permut
 ### 16.2.2 The graph convolutional network, derived
 
 Kipf & Welling (2017) obtained the GCN from spectral graph theory. The normalized graph Laplacian is $\mathbf{L}=\mathbf{I}-\mathbf{D}^{-1/2}\mathbf{A}\mathbf{D}^{-1/2}$ with eigendecomposition $\mathbf{U}\boldsymbol\Lambda\mathbf{U}^\top$; a *spectral filter* acts as $g_\theta(\mathbf{L})\mathbf{x}=\mathbf{U}g_\theta(\boldsymbol\Lambda)\mathbf{U}^\top\mathbf{x}$ (the graph analogue of convolution as multiplication in the Fourier domain). Approximating $g_\theta$ by a first-order Chebyshev polynomial and tying parameters gives $\theta(\mathbf{I}+\mathbf{D}^{-1/2}\mathbf{A}\mathbf{D}^{-1/2})\mathbf{x}$. Because the eigenvalues of this operator lie in $[0,2]$, repeated application is unstable; the **renormalization trick** replaces $\mathbf{A}$ by $\tilde{\mathbf{A}}=\mathbf{A}+\mathbf{I}$ (self-loops) and $\mathbf{D}$ by $\tilde{\mathbf{D}}$, giving the layer
+
 $$
 \mathbf{H}^{(\ell+1)}=\sigma\Big(\tilde{\mathbf{D}}^{-1/2}\tilde{\mathbf{A}}\tilde{\mathbf{D}}^{-1/2}\,\mathbf{H}^{(\ell)}\mathbf{W}^{(\ell)}\Big),
 $$
+
 a *normalized neighborhood average* followed by a shared linear map. Each node's new feature is a degree-normalized mean of itself and its neighbors, transformed. **Graph attention networks** (GAT; Veličković et al., 2018) replace the fixed normalized-adjacency weights by learned attention weights over neighbors.
 
 !!! rhyme "Structural rhyme: Transformer ↔ graph attention on the complete graph"
@@ -81,11 +85,13 @@ For energies and binding, geometry matters. **SchNet** (Schütt et al., 2017) us
 ### 16.3.3 E(n)-equivariant networks (EGNN)
 
 Satorras, Hoogeboom & Welling (2021) give a simple equivariant layer. With invariant node features $\mathbf{h}_i$ and coordinates $\mathbf{x}_i\in\R^3$:
+
 $$
 \mathbf{m}_{ij}=\phi_e\big(\mathbf{h}_i,\mathbf{h}_j,\|\mathbf{x}_i-\mathbf{x}_j\|^2\big),\qquad
 \mathbf{x}_i'=\mathbf{x}_i+\frac1{n-1}\sum_{j\ne i}(\mathbf{x}_i-\mathbf{x}_j)\,\phi_x(\mathbf{m}_{ij}),\qquad
 \mathbf{h}_i'=\phi_h\Big(\mathbf{h}_i,\sum_j\mathbf{m}_{ij}\Big).
 $$
+
 *Proof of equivariance.* Under $\mathbf{x}_i\mapsto\mathbf{R}\mathbf{x}_i+\mathbf{t}$ ($\mathbf{R}$ orthogonal), the squared distance $\|\mathbf{x}_i-\mathbf{x}_j\|^2$ is unchanged, so $\mathbf{m}_{ij}$ and $\mathbf{h}'_i$ are unchanged (invariant). The displacement $\mathbf{x}_i-\mathbf{x}_j\mapsto\mathbf{R}(\mathbf{x}_i-\mathbf{x}_j)$ while its scalar coefficient $\phi_x(\mathbf{m}_{ij})$ is invariant, so $\mathbf{x}'_i\mapsto\mathbf{R}\mathbf{x}'_i+\mathbf{t}$. $\square$ The code verifies on 7 points: coordinate equivariance error $4.8\times10^{-7}$, feature invariance $1.2\times10^{-7}$; a naive MLP applied to raw coordinates violates equivariance by $\|f(\mathbf{R}\mathbf{x})-\mathbf{R}f(\mathbf{x})\|=1.30$.
 
 !!! warning "Chirality: E(3) is the wrong group for biomolecules"
@@ -118,9 +124,11 @@ A protein backbone can be described by one **rigid frame** per residue: the orth
 ### 16.4.2 Invariant point attention (IPA)
 
 AlphaFold 2's structure module (Jumper et al., 2021) updates residue representations with **invariant point attention**. In addition to the usual scalar queries/keys/values, each residue emits *3-D points* $\vec{\mathbf{q}}_i^{\,p},\vec{\mathbf{k}}_i^{\,p},\vec{\mathbf{v}}_i^{\,p}\in\R^3$ **in its local frame**. Their global positions are $\mathbf{T}_i\circ\vec{\mathbf{q}}_i^{\,p}=\mathbf{R}_i\vec{\mathbf{q}}_i^{\,p}+\mathbf{t}_i$. The attention logit between residues $i$ and $j$ combines scalar similarity, a pair-representation bias, and a **geometric term**:
+
 $$
 a_{ij}\;\propto\;\frac{\mathbf{q}_i^\top\mathbf{k}_j}{\sqrt{c}}+b_{ij}-\frac{\gamma}{2}\sum_p\big\|\mathbf{T}_i\circ\vec{\mathbf{q}}_i^{\,p}-\mathbf{T}_j\circ\vec{\mathbf{k}}_j^{\,p}\big\|^2 .
 $$
+
 Output points are aggregated in the global frame and mapped back into residue $i$'s local frame: $\vec{\mathbf{o}}_i^{\,p}=\mathbf{T}_i^{-1}\circ\sum_ja_{ij}\,\mathbf{T}_j\circ\vec{\mathbf{v}}_j^{\,p}$.
 
 *Why it is invariant.* If all frames undergo a global rigid motion $\mathbf{g}$, $\mathbf{T}_i\to\mathbf{g}\mathbf{T}_i$, then $\mathbf{T}_i\circ\vec{\mathbf{q}}\to\mathbf{g}(\mathbf{T}_i\circ\vec{\mathbf{q}})$; distances between transformed points are unchanged, so the logits are unchanged; and $\mathbf{T}_i^{-1}\circ\mathbf{g}^{-1}\mathbf{g}\,(\cdots)=\mathbf{T}_i^{-1}\circ(\cdots)$, so the output points in local frames are unchanged. $\square$ The structure module then predicts a *rigid update* to each frame, $\mathbf{T}_i\leftarrow\mathbf{T}_i\circ\Delta\mathbf{T}_i$, an $SE(3)$-equivariant operation by construction. The loss (**FAPE**, frame-aligned point error) measures atom positions *in each residue's local frame*, so it is invariant to global motion yet sensitive to *chirality* (a mirror image has large FAPE). Chapter 35 uses these pieces.
@@ -134,9 +142,11 @@ For inverse folding (Chapter 36), a backbone is converted to a $k$-nearest-neigh
 ## 16.5 Sets and the permutation symmetry in single-cell and patient data
 
 A cell's expression profile is a set of (gene, value) pairs; a patient's single-cell sample is a set of cells. **DeepSets** (Zaheer et al., 2017) shows that a function on a set $X$ is permutation-invariant iff it can be written as
+
 $$
 f(X)=\rho\Big(\sum_{x\in X}\phi(x)\Big),
 $$
+
 for suitable $\phi,\rho$ (for sets of bounded size and a sufficiently high-dimensional $\phi$; Wagstaff et al., 2019, discuss the dimension requirement). [[E]] Set Transformers add attention among elements. This is the architecture of **multiple-instance learning** (a patient label from a bag of cells) and of any model whose input is a bag of genes or reads. *Caveat:* sum-pooling is blind to which cells *interact* (neighbors in tissue); spatial data call for graph models on a cell neighborhood graph (Chapter 40).
 
 ---

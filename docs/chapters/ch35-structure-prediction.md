@@ -101,9 +101,11 @@ def triangle_out(z, Wa, Wb, Wg, Wo):
 **Structure module** (8 blocks, weights shared). Starting from every residue at the origin in an identity frame ("black hole" initialization), it updates backbone *frames* $T_i=(R_i,t_i)\in SE(3)$ with **invariant point attention** (IPA): attention logits combine the usual query-key term, a pair-bias term from $z$, and a term from the *distances between 3-D points* (predicted in each residue's local frame and mapped to the global frame), which are invariant to a global rotation and translation. The output is a set of frames and side-chain torsion angles, thus all-atom coordinates.
 
 **Loss.** The main loss is the **frame-aligned point error (FAPE)**: for every pair of a frame $T_i$ and a point $x_j$, compare the position of $x_j$ expressed in frame $i$ in the prediction and in the ground truth,
+
 $$
 \mathcal L_\text{FAPE}=\frac1{|F||X|}\sum_{i\in F}\sum_{j\in X}\min\!\big(d_\text{clamp},\ \|T_i^{-1}x_j-T_i^{\star-1}x_j^\star\|\big),
 $$
+
 which is invariant to global rigid motions but *not* to reflections: a mirrored structure has different local-frame coordinates, which is how AF2 acquires chirality (§35.1, point 5). Auxiliary losses include a **distogram** (a classification of pairwise distance bins from $z$), a masked-MSA loss (the BERT-style objective of Chapter 13, applied to the MSA), and confidence losses.
 
 **Recycling.** The outputs (pair representation, a distance map from the predicted structure, the first MSA row) are fed back as inputs for 3 more passes, an iterative refinement that costs only compute.

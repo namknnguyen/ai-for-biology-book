@@ -38,9 +38,11 @@ $$
 ### 21.3.2 Consequences
 
 **(a) Heterozygosity decays.** Two gene copies in the new generation are copies of the *same* parental gene with probability $1/(2N)$ (identical by descent); otherwise they are independent draws. Therefore
+
 $$
 H_{t+1}=\Big(1-\frac1{2N}\Big)H_t\quad\Longrightarrow\quad H_t=H_0\Big(1-\frac1{2N}\Big)^t\approx H_0\,e^{-t/(2N)}.
 $$
+
 Simulated heterozygosity after 50 generations at $N=100$: $0.3896$ (theory $0.3892$). *Drift erodes variation at rate $1/(2N)$ per generation.*
 
 **(b) Neutral fixation probability equals initial frequency.** Because $p_t$ is a martingale bounded in $[0,1]$ and eventually absorbed at 0 or 1 (loss or fixation), the optional stopping theorem gives $p_0=\E[p_\infty]=P(\text{fix})$. A new neutral mutation (one copy among $2N$) therefore fixes with probability $1/(2N)$. Simulation with $p_0=0.1$: fixation probability $0.1001$.
@@ -85,9 +87,11 @@ Simulations ($N=100$) confirm the formula: for $s=0$, $0.0100$ (theory $0.0100$)
 ## 21.5 Population structure and $F_{ST}$
 
 Two populations that split from a common ancestral population and drift independently diverge in allele frequency. A standard summary is $F_{ST}$, the proportion of total genetic variance attributable to differences between populations: $F_{ST}=\dfrac{\mathrm{Var}(p_i)}{\bar p(1-\bar p)}$ (variance of subpopulation frequencies, relative to the maximum possible for the pooled frequency). For two populations of size $N$ drifting for $t$ generations, heterozygosity within each decays as $e^{-t/2N}$ relative to the pooled expectation, so
+
 $$
 F_{ST}\approx1-e^{-t/(2N)}\approx\frac{t}{2N}.
 $$
+
 The simulation ($N=500$, $t=50$) gives $F_{ST}=0.0499$ against theory $0.0488$. Human populations have $F_{ST}\approx0.05$–$0.15$ between continental groups; **most human genetic variation (~85–90%) is within populations**, but the *structured* remainder is exactly what dominates the leading principal components (Chapter 2, §2.6).
 
 **PCA and genealogy.** The principal components of a genotype matrix are closely related to average coalescence times between individuals (McVean, 2009): the leading components separate groups whose pairwise coalescence times are long. This is the evolutionary meaning of the "population structure" PC1 in Chapter 2's simulation (Balding–Nichols with $F_{ST}=0.05$).
@@ -108,9 +112,11 @@ Pick two gene copies in the current generation. Their parents are the same copy 
 - **Total tree length:** $\E[L]=\sum_{k=2}^nk\,\E[T_k]=\sum_{k=2}^n\frac2{k-1}=2\sum_{i=1}^{n-1}\frac1i=2a_n$.
 - **Segregating sites.** Mutations arrive on the tree as a Poisson process of rate $\theta/2$ per unit time (with $\theta=4N\mu$ for the locus), so $\E[S]=\frac\theta2\E[L]=\theta\,a_n$. This gives **Watterson's estimator** $\hat\theta_W=S/a_n$.
 - **The neutral site-frequency spectrum.** A mutation on a branch that subtends $i$ of the $n$ sampled sequences appears in $i$ copies. The expected number of such sites is
+
 $$
 \E[\xi_i]=\frac{\theta}{i},\qquad i=1,\dots,n-1.
 $$
+
 Rare variants are the most numerous; singletons are $\theta$, doubletons $\theta/2$, and so on.
 
 The code simulates 20,000 coalescent trees with $n=10$, $\theta=4$: mean TMRCA $1.799$ (theory $1.800$), mean tree length $5.658$ (theory $5.658$), mean segregating sites $11.32$ (theory $11.32$), and the spectrum $\{3.99,2.03,1.31,0.82,0.44\}$ at $i=1,2,3,5,9$ against theory $\{4.00,2.00,1.33,0.80,0.44\}$.
@@ -129,9 +135,11 @@ The code simulates 20,000 coalescent trees with $n=10$, $\theta=4$: mean TMRCA $
 **Linkage disequilibrium (LD)** is the non-random association of alleles at two loci. For alleles A (frequency $p_A$) and B ($p_B$) at nearby loci, $D=p_{AB}-p_Ap_B$, with the normalized measure $r^2=\dfrac{D^2}{p_A(1-p_A)p_B(1-p_B)}$, the squared correlation between the two loci's allele indicators.
 
 **Decay with recombination.** Let $c$ be the recombination fraction between the loci. Each generation a fraction $c$ of haplotypes are recombinant, which breaks the association: $p_{AB}'=(1-c)\,p_{AB}+c\,p_Ap_B$. Subtracting $p_Ap_B$ (which is unchanged under random mating):
+
 $$
 D_t=(1-c)^t\,D_0 .
 $$
+
 For $c=0.01$, $D_0=0.1$, after 50 generations the code finds $D=0.06050$, matching $D_0(1-c)^{50}=0.06050$. LD decays at rate $c$ per generation, so **close loci stay correlated for long and distant loci decorrelate quickly**.
 
 **Equilibrium LD.** With drift and recombination the expected squared correlation is approximately $\E[r^2]\approx\dfrac{1}{1+4N_ec}$ (Sved, 1971; for $4N_ec\gg1$), so LD extends over $\sim1/(4N_ec)$ and, since the human recombination rate is $\sim10^{-8}$ per bp per generation ($1\,\text{cM/Mb}$), LD blocks span tens of kilobases in non-African populations and are shorter in African populations (with larger long-term $N_e$ and more recombination history).
@@ -152,13 +160,17 @@ For $c=0.01$, $D_0=0.1$, after 50 generations the code finds $D=0.06050$, matchi
 Model the evolution of a nucleotide at one site as a **continuous-time Markov chain** on $\{A,C,G,T\}$ with rate matrix $\mathbf{Q}$ (off-diagonal $Q_{ij}\ge0$ the rate of $i\to j$; rows sum to zero). The transition probabilities over time $t$ are the matrix exponential $\mathbf{P}(t)=e^{\mathbf{Q}t}$. A model is **time-reversible** if $\pi_iQ_{ij}=\pi_jQ_{ji}$ for the stationary distribution $\boldsymbol\pi$ (detailed balance), which makes the likelihood independent of the root position (Felsenstein's pulley principle).
 
 **Jukes–Cantor (JC69).** All substitutions equally likely, total rate $\mu$ per site: $\mathbf{Q}=\frac\mu3(\mathbf{J}-4\mathbf{I})$ with $\mathbf{J}$ the all-ones matrix. Its eigenvalues are $0$ (eigenvector $\mathbf{1}$) and $-\frac{4\mu}3$ (multiplicity 3), so
+
 $$
 \mathbf{P}(t)=\tfrac14\mathbf{J}+\big(\mathbf{I}-\tfrac14\mathbf{J}\big)e^{-4\mu t/3},\qquad P_{ii}(t)=\tfrac14+\tfrac34e^{-4\mu t/3},\quad P_{ij}(t)=\tfrac14-\tfrac14e^{-4\mu t/3}.
 $$
+
 The observed fraction of differing sites between two sequences diverged for total time $2t$ (or branch length $t$ in a pairwise comparison) is $p=\frac34(1-e^{-4\mu t/3})$. Solving for the true distance gives the **Jukes–Cantor correction**
+
 $$
 d=\mu t=-\frac34\ln\Big(1-\frac43p\Big).
 $$
+
 It corrects for *multiple hits* (a site mutating more than once, which makes $p$ saturate at $3/4$): in the code, true distances $0.1,0.5,1.0,2.0$ give observed $p=0.094,0.365,0.552,0.698$, and the corrected $d$ recovers $0.100,0.500,1.000,2.000$ exactly. **Saturation is why raw sequence identity stops informing about distance beyond a certain divergence** (the twilight zone of homology detection at $\sim25$–$30\%$ protein identity; Chapter 27).
 
 **Richer models.** *K80 / HKY* distinguish transitions and transversions and unequal base frequencies; *GTR* (general time-reversible) has six exchangeabilities plus base frequencies; *rate heterogeneity across sites* is modeled by a Gamma distribution (some sites evolve fast, many are near-invariant); *codon models* describe substitutions among 61 sense codons and define $\omega=d_N/d_S$, the ratio of nonsynonymous to synonymous substitution rates: $\omega<1$ purifying selection, $\omega\approx1$ neutral, $\omega>1$ positive selection (typically detected for only a few sites or lineages, since most of a protein is constrained).

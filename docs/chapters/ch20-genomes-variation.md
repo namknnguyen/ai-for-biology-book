@@ -84,9 +84,11 @@ Mutation is **not uniform**. Three regularities every sequence modeler must know
 3. **Local sequence context and replication/repair dependence.** Rates depend on the flanking bases (the trinucleotide context), replication timing, transcription (strand asymmetry), and exposures (UV, tobacco, alkylating agents). Cancer genomics decomposes somatic mutations into **mutational signatures** (COSMIC SBS signatures; Alexandrov et al., 2013): SBS1 is the clock-like CpG signature, SBS7 UV, SBS4 tobacco.
 
 **Why this matters for ML.** In Chapter 5 we derived that, at mutation–selection equilibrium, the log-likelihood ratio of a variant satisfies
+
 $$
 \log\pi(x')-\log\pi(x)=2(N-1)\,\Delta\log f+\underbrace{\log\frac{\mu(x\to x')}{\mu(x'\to x)}}_{\text{mutation bias}},
 $$
+
 so a sequence model trained on a corpus of related genomes, or on an alignment, will assign **much higher likelihood to frequently mutating changes even if they are neutral**. The **simulation** below makes this concrete.
 
 ### 20.3.3 A simulation: mutation bias versus selection

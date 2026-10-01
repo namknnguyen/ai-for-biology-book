@@ -35,9 +35,11 @@ Real shifts combine these. The distinction matters because **each type has a dif
 ## 45.2 What can be corrected without target labels
 
 **Covariate shift** is correctable *if the supports overlap*. The target risk is a reweighted source risk,
+
 $$
 \mathbb E_T[\ell(f(x),y)]=\mathbb E_S\Big[w(x)\,\ell(f(x),y)\Big],\qquad w(x)=\frac{p_T(x)}{p_S(x)},
 $$
+
 and the weights can be estimated from unlabeled data by a **domain classifier**: if $d(x)=P(\text{target}\mid x)$, then $w(x)=\frac{n_S}{n_T}\frac{d(x)}{1-d(x)}$ (Shimodaira, 2000; Sugiyama et al., 2007). Cost: the **effective sample size** $\mathrm{ESS}=(\sum w)^2/\sum w^2$ shrinks as the shift grows, increasing variance; where the target has no source support ($p_S=0,p_T>0$), no weighting helps (novelty).
 
 **Label shift** is correctable from *unlabeled* target data: if $P(x\mid y)$ is fixed, the target posterior is $P_T(y\mid x)\propto P_S(y\mid x)\,P_T(y)/P_S(y)$, and the target prior $P_T(y)$ is estimated by EM on the target's unlabeled predictions (Saerens et al., 2002) or by black-box shift estimation (Lipton et al., 2018).

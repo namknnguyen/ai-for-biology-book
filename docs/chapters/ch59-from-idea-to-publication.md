@@ -33,9 +33,11 @@ Before looking at test results write down: the primary question and metric; the 
 ### 59.2.2 Power and effect sizes
 
 For a comparison between methods on $n$ independent units (proteins, donors, loci, perturbations) with paired differences of standard deviation $s$, a mean improvement $\Delta$ is detectable with probability $1-\beta$ at level $\alpha$ when
+
 $$
 n\ \gtrsim\ \Big(\frac{(z_{1-\alpha/2}+z_{1-\beta})\,s}{\Delta}\Big)^2 .
 $$
+
 For $\alpha=0.05$ and power 0.8, $(1.96+0.84)^2\approx7.8$, so $n\approx7.8\,s^2/\Delta^2$. A benchmark with 40 proteins and $s=0.15$ in Spearman correlation can detect a mean improvement of about $0.15\sqrt{7.8/40}\approx0.066$; the typical gains reported between neighboring models (0.02–0.04) are below that threshold, which is why *paired bootstrap over units*, and honest statements of what cannot be resolved, matter. When the *effective* number of units is smaller than the nominal one (clusters of homologs; donors; analog series), use the effective number.
 
 ### 59.2.3 Engineering for reproducibility

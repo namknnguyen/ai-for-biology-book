@@ -34,9 +34,11 @@ For a binary treatment $T$ and outcome $Y$, each unit has potential outcomes $Y(
 ### 44.2.3 Confounding, adjustment, and the backdoor criterion
 
 A **confounder** $Z$ causes both $X$ and $Y$, opening a "backdoor" path $X\leftarrow Z\rightarrow Y$. If a set $Z$ blocks all backdoor paths between $X$ and $Y$ and contains no descendant of $X$, then
+
 $$
 P\big(y\mid\mathrm{do}(x)\big)=\sum_zP(y\mid x,z)\,P(z)\qquad(\text{adjustment formula}).
 $$
+
 *Proof sketch.* In the intervened model, $z$ keeps its marginal $P(z)$ (the intervention does not affect its causes) and $y$ keeps its conditional $P(y\mid x,z)$ (the mechanism for $y$ is unchanged). Marginalizing over $z$ gives the formula. The requirement that $Z$ be **measured** is the practical difficulty: *adjustment cannot remove a confounder that is hidden*.
 
 **Colliders.** Conditioning on a common effect $X\rightarrow C\leftarrow Y$ *creates* an association between $X$ and $Y$ (collider bias or selection bias). Examples in biology: selecting cells by a marker that both the perturbation and the outcome affect; restricting analysis to cells that survive the perturbation; case–control ascertainment (Chapter 26); selecting variants by significance in the same data.
@@ -65,9 +67,11 @@ A causal quantity is **identified** if it is a function of the observed-data dis
 | **Measurement** | The assay depends on the exposure | Differences in detection rather than biology |
 
 **A one-line derivation.** Let $x_i=\lambda_iu+e_i$ and $x_j=\beta x_i+\lambda_ju+e_j$ with hidden $u$ ($\mathrm{Var}\,u=1$). Then $\mathrm{Cov}(x_i,x_j)=\beta\,\mathrm{Var}(x_i)+\lambda_i\lambda_j$ and the regression slope of $x_j$ on $x_i$ is
+
 $$
 \hat\beta_\text{OLS}=\beta+\frac{\lambda_i\lambda_j}{\mathrm{Var}(x_i)}.
 $$
+
 The bias $\lambda_i\lambda_j/\mathrm{Var}(x_i)$ **does not depend on $n$**. With $\beta=0$ (no effect) and loadings of the same sign, the "effect" is positive and, for large $n$, arbitrarily significant.
 
 ---

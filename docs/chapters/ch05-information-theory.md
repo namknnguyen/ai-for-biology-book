@@ -193,21 +193,29 @@ This is the central bridge between language modeling and evolution (Chapters 32,
 
 !!! math "Derivation: stationary distribution of mutation–selection–drift and the log-likelihood ratio"
     Consider a population of effective size $N$ in the *weak-mutation* regime, in which a new mutation fixes or is lost before the next arises, so the population is nearly monomorphic and moves between genotypes. Let $\mu(x\to x')$ be the rate at which mutation proposes $x'$ from $x$, and $\rho(x\to x')$ the probability that the mutant fixes. The chain over genotypes has transition rate $\mu(x\to x')\rho(x\to x')$. At stationarity, detailed balance holds:
+
     $$
     \pi(x)\,\mu(x\to x')\,\rho(x\to x')=\pi(x')\,\mu(x'\to x)\,\rho(x'\to x).
     $$
+
     Let $s=\log f(x')-\log f(x)$ be the selection coefficient of the mutant relative to the resident. In one common convention (a haploid population of size $N$ under the diffusion approximation), the fixation probability of a new mutant is $\rho(s)=\dfrac{1-e^{-2s}}{1-e^{-2Ns}}$. The ratio of fixation probabilities for the forward and reverse substitutions is
+
     $$
     \frac{\rho(s)}{\rho(-s)}=\frac{(1-e^{-2s})(1-e^{2Ns})}{(1-e^{-2Ns})(1-e^{2s})}=e^{-2s}\cdot e^{2Ns}=e^{2(N-1)s}.
     $$
+
     Therefore
+
     $$
     \frac{\pi(x')}{\pi(x)}=\frac{\mu(x\to x')}{\mu(x'\to x)}\,e^{2(N-1)\,(\log f(x')-\log f(x))}.
     $$
+
     Taking logs, for a variant $x\to x'$,
+
     $$
     \underbrace{\log\pi(x')-\log\pi(x)}_{\text{equilibrium log-likelihood ratio}}=2(N-1)\,\Delta\log f+\underbrace{\log\frac{\mu(x\to x')}{\mu(x'\to x)}}_{\text{mutation bias}} .
     $$
+
     (Conventions differ by constants, e.g., $4N_e$ for diploid Wright–Fisher; Sella & Hirsh, 2005.)
 
 **Reading the result.** If a language model $p_\theta$ perfectly learned the equilibrium distribution $\pi$, its log-likelihood ratio for a variant would equal a *scaled difference in log fitness* plus a *mutation-bias term*. This is the theoretical justification for **zero-shot variant-effect prediction by $\Delta\log p_\theta$** (Chapters 32, 34). It also lists exactly what has to hold, and each item is a potential failure mode:

@@ -37,6 +37,9 @@ Every chapter is organized so that it contributes to a single skill: moving alon
 | **IX** | The frontier | 49–54 | Competing paradigms and the open-problem atlas, each problem analyzed with the same diagnostic questions |
 | **X** | Independent research | 55–59 | Ten systematic strategies for generating ideas, evaluating them, reading papers, reasoning without answers, and turning ideas into research programs |
 
+!!! tip "PDF edition"
+    A single-file PDF of the whole book (462 pages, with bookmarks and a linked contents list) is available: [**download ai-for-biology-book.pdf**](assets/ai-for-biology-book.pdf) (about 42 MB).
+
 Start with the [**complete table of contents**](front/toc.md), the [**dependency graph**](front/dependency-graph.md) that shows how concepts build on one another, the [**learning trajectory**](front/learning-trajectory.md), the [**map of the fields**](front/field-map.md), and the list of [**research skills**](front/research-skills.md) the book is designed to develop. Then read [How to use this book](front/how-to-use.md) and begin [Chapter 1](chapters/ch01-expert-chain.md).
 
 ## A note on honesty and dates

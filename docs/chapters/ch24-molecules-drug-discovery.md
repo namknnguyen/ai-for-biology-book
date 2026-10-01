@@ -44,9 +44,11 @@ The workhorse molecular featurization, for decades and still a strong baseline, 
 
 !!! math "Morgan fingerprint as iterated hashing"
     Give every atom $i$ an initial integer identifier $I_i^{(0)}=h_0(\text{atomic invariants of }i)$ (element, degree, charge, hydrogen count, ring membership). For $r=1,\dots,R$ update
+
     $$
     I_i^{(r)}=h\Big(I_i^{(r-1)},\ \operatorname{sort}\big\{(b_{ij},\,I_j^{(r-1)}):\ j\in\mathcal N(i)\big\}\Big),
     $$
+
     where $b_{ij}$ is the bond type and $h$ is a hash function. The fingerprint is the *multiset* $\{I_i^{(r)}:\,i\in V,\ 0\le r\le R\}$; to obtain a fixed-length vector of dimension $B$ (usually $B=1024$ or $2048$) each identifier is **folded** by $I\bmod B$ and either set to 1 (bit vector) or counted (count vector). The cost is $O(R\,|E|)$ per molecule and the output is $\le(R+1)|V|$ nonzero entries.
 
 **Rhyme with message passing.** This is *exactly* one round of message passing per radius step, with an injective, order-invariant aggregator (sort the neighbor multiset, then hash). It is the **1-dimensional Weisfeiler–Lehman (WL) color refinement** algorithm; Xu et al. (2019) proved that message-passing GNNs with injective aggregators are as discriminating as the 1-WL test, and no more. Consequently *a Morgan fingerprint with unlimited radius and no folding loses no information that a standard GNN can see*; what differs is that the fingerprint's functions are fixed hashes (no learned similarity between environments), while a GNN learns embeddings in which similar environments are nearby.
@@ -66,30 +68,40 @@ Three properties follow from the algorithm and can be checked in the data:
 ### 24.4.1 The isotherm
 
 For a protein $P$ binding a ligand $L$ in 1:1 stoichiometry, $P+L\rightleftharpoons PL$, mass action at equilibrium gives the dissociation constant
+
 $$
 K_d=\frac{[P][L]}{[PL]}.
 $$
+
 Let $\theta=[PL]/([P]+[PL])$ be the fraction of protein bound. In the usual regime where the ligand is in large excess over the protein, $[L]\approx[L]_\text{total}$ and
+
 $$
 \theta=\frac{[L]}{K_d+[L]}.
 $$
+
 This is a **sigmoid in $\log[L]$** with a fixed shape (Hill slope $=1$): $\theta$ rises from 10% to 90% over an 81-fold range of concentration, and the midpoint is $K_d$. It has the same form as TF occupancy (Chapter 22) and the fraction of folded protein (Chapter 23): *a sigmoid is what a single two-state thermodynamic equilibrium looks like*. The standard binding free energy is
+
 $$
 \Delta G^\circ=RT\ln\frac{K_d}{c^\circ}\quad(c^\circ=1\ \text{M}),\qquad
 \Delta G^\circ=-RT\ln(10)\cdot pK_d=-1.37\ \text{kcal/mol}\times pK_d\ \ (\text{at }298\text{ K},\ RT=0.593).
 $$
+
 **One log unit of potency is 1.37 kcal/mol.** A 1 nM binder ($pK_d=9$) has $\Delta G^\circ\approx-12.3$ kcal/mol; a 10 µM binder ($pK_d=5$) has $-6.8$ kcal/mol. The 1,513 BACE-1 inhibitors we analyze below span $pIC_{50}$ 2.5–10.5, i.e. $-3.5$ to $-14.4$ kcal/mol (assuming $IC_{50}\approx K_d$; §24.4.2): *a factor of $10^8$ in potency is only 11 kcal/mol of free energy*, and a typical 10-fold optimization step is 1.4 kcal/mol, about the energy of a single good hydrogen bond *if nothing else changes*.
 
 ### 24.4.2 IC$_{50}$ is not $K_d$: Cheng–Prusoff
 
 Most potency data are $IC_{50}$ values: the inhibitor concentration that halves an observed activity. For a **competitive** inhibitor of an enzyme with substrate $S$, the Michaelis–Menten rate is
+
 $$
 v=\frac{V_{\max}[S]}{K_m\,(1+[I]/K_i)+[S]}.
 $$
+
 Without inhibitor, $v_0=V_{\max}[S]/(K_m+[S])$. Setting $v=v_0/2$ and solving for $[I]$:
+
 $$
 K_m\big(1+[I]/K_i\big)+[S]=2(K_m+[S])\ \Rightarrow\ [I]_{50}=IC_{50}=K_i\Big(1+\frac{[S]}{K_m}\Big)\quad\text{(Cheng–Prusoff, 1973)}.
 $$
+
 So $IC_{50}$ depends on the *assay's substrate concentration*, and a pair of labs using different $[S]$ report different numbers for the same molecule. If $[S]\ll K_m$ then $IC_{50}\approx K_i$. For non-competitive or tight-binding inhibitors, and for cell-based assays (where permeability, efflux, and target abundance enter), the relation changes again. **A dataset of $pIC_{50}$ values pooled across papers is a mixture of different link functions from the latent $\Delta G$**, the same structure as the "assay link" of Chapter 23.
 
 **Measurement noise.** Even after careful curation, the experimental uncertainty of individual published $K_i$ values in ChEMBL was estimated at a standard deviation of about 0.54 $pK_i$ units (mean absolute error 0.44), which limits the Pearson $R^2$ of any model against such a dataset to about 0.81 on large heterogeneous collections (Kramer et al., 2012) [[S]]; mixed-source $IC_{50}$ data are, if anything, noisier (Kalliokoski et al., 2013; Landrum & Riniker, 2024) [[S]]. We use $\sigma=0.54$ below as an illustration.
@@ -188,9 +200,11 @@ Three lessons. **(i) A scaffold split is not a similarity split.** Splitting by 
 ### 24.7.3 The noise ceiling
 
 If the best possible predictor knows the true $pIC_{50}$ exactly but the labels have independent noise of SD $\sigma$, its $R^2$ against the labels is $1-\sigma^2/\mathrm{Var}(y)$ (Chapter 1). With $\sigma=0.54$ and $\mathrm{SD}(y)=1.34$:
+
 $$
 R^2_\max=1-\frac{0.54^2}{1.34^2}=0.84,\qquad r_\max=0.92,\qquad \mathrm{RMSE}_\min=0.54.
 $$
+
 The random-split model has $r=0.854$ ($R^2=0.73$) and RMSE $0.70$. *If* the BACE-1 labels carry noise comparable to heterogeneous ChEMBL data, the random-split benchmark is within $\sim0.1$ of its ceiling and cannot distinguish a good model from a better one: the implied excess model error is $\sqrt{0.70^2-0.54^2}=0.45$ log units. The benchmark has saturated; the interesting evaluations are the cluster split and prospective tests. (Caveat: the noise level of this particular dataset is not measured; replicate data would give it.)
 
 ### 24.7.4 Activity cliffs are where the model stops being a model
@@ -272,12 +286,15 @@ scaffold  RMSE (logS): linear on 4 descriptors 1.051 | RF on 4 descriptors 0.892
 ## 24.8 Structure-based methods: docking, scoring, and free-energy perturbation
 
 **Docking** searches for the ligand's pose (position, orientation, conformation) in a protein binding site and ranks poses by a **scoring function** $S(\text{pose})$ that approximates the binding free energy. A rigorous decomposition is
+
 $$
 \Delta G_\text{bind}=\underbrace{\Delta E_\text{gas}}_{\text{contacts, H-bonds}}+\underbrace{\Delta G_\text{solv}(PL)-\Delta G_\text{solv}(P)-\Delta G_\text{solv}(L)}_{\text{desolvation}}-T\,\Delta S_\text{conf}-T\,\Delta S_\text{trans/rot}.
 $$
+
 Each term is large (tens of kcal/mol) and mostly cancels, and a **1.4 kcal/mol** error in the sum is an *order of magnitude* error in $K_d$. Fast scoring functions (empirical, knowledge-based, or learned) approximate this with few terms and a rigid receptor; they are reasonable at pose ranking but poor at *affinity ranking across chemically diverse ligands*, and their accuracy depends on protonation states, structural water, and receptor flexibility, all poorly handled. In practice docking is used as an *enrichment* tool (a modest improvement over random selection from a library), not a measurement.
 
 **Free-energy perturbation (FEP)** computes *relative* binding free energies between two similar ligands $A$ and $B$ by alchemically transforming one into the other. Because $\Delta G$ is a state function, the thermodynamic cycle
+
 $$
 \begin{array}{ccc}
 P+A & \xrightarrow{\ \Delta G_\text{bind}(A)\ } & PA\\
@@ -285,10 +302,13 @@ P+A & \xrightarrow{\ \Delta G_\text{bind}(A)\ } & PA\\
 P+B & \xrightarrow{\ \Delta G_\text{bind}(B)\ } & PB
 \end{array}
 $$
+
 gives
+
 $$
 \Delta\Delta G_\text{bind}(A\to B)=\Delta G_\text{bind}(B)-\Delta G_\text{bind}(A)=\Delta G_\text{prot}(A\to B)-\Delta G_\text{solv}(A\to B).
 $$
+
 The two transformation free energies on the right are *computable* by molecular-dynamics sampling along a path of intermediate (non-physical) states (using, e.g., the Zwanzig or Bennett acceptance ratio estimators), and the hard-to-compute absolute terms cancel. With modern force fields and careful setup, prospective studies reported mean unsigned errors of about 1 kcal/mol for congeneric series (Wang et al., 2015) [[S]], roughly a 5-fold potency error: much better than docking, at a cost of GPU-hours per transformation, and subject to the quality of the force field, the starting structure, and sampling. FEP supplies precisely what the activity-cliff analysis found missing (3-D, physics) at orders of magnitude greater cost, which is why *combining* cheap ML triage with FEP on the shortlist is a standard industrial workflow, and why ML models that learn to approximate FEP-quality predictions (Chapter 37) are attractive.
 
 ---

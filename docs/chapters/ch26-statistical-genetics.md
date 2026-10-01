@@ -24,10 +24,13 @@
 ## 26.2 The additive model and what heritability means
 
 Take $n$ individuals and standardize the phenotype ($\mathbb E y=0,\ \mathrm{Var}\,y=1$) and each genotype column to mean 0 and variance 1. The **additive model** is
+
 $$
 y=X\beta+\varepsilon,\qquad \varepsilon_i\sim\mathcal N(0,\sigma_e^2),
 $$
+
 with $\beta\in\mathbb R^M$ the vector of per-standardized-allele effects. The variance explained by the genotypes, the **(SNP) heritability**, is
+
 $$
 h^2=\frac{\mathrm{Var}(X\beta)}{\mathrm{Var}(y)}=\beta^\top R\,\beta,\qquad R=\tfrac1n X^\top X\ (\text{the LD matrix}),\qquad \sigma_e^2=1-h^2 .
 $$
@@ -44,13 +47,17 @@ Three cautions that a machine-learning reader must internalize. (i) **$h^2$ is a
 ## 26.3 Linkage disequilibrium: association is a blurred picture of causation
 
 Suppose the true model is $y=X\beta+\varepsilon$ and we test variant $j$ alone. Then
+
 $$
 \hat\beta_j=\tfrac1n x_j^\top y=\sum_k R_{jk}\beta_k+\tfrac1n x_j^\top\varepsilon,
 $$
+
 the marginal effect of $j$ is the **$R$-weighted sum of all effects in LD with it**. In vector form, with $z=\sqrt n\hat\beta/\sqrt{1-\hat\beta^2}\approx\sqrt n\hat\beta$ and the residual noise having covariance $R$,
+
 $$
 \boxed{\;z\sim\mathcal N\big(\sqrt n\,R\beta,\ R\big)\;}
 $$
+
 This is the central equation of statistical genetics: *the observed association map is the causal-effect map convolved with the LD matrix*. Four consequences.
 
 1. **The lead SNP is a tag.** The most significant variant at a locus has the largest $|(R\beta)_j|$, not necessarily $\beta_j\ne0$. If a causal variant has an LD partner with $r=0.97$, the partner will be significant too, and by noise the partner is the lead variant in a substantial fraction of samples (§26.5).
@@ -71,13 +78,17 @@ If ancestry affects both allele frequency and the phenotype (through environment
 ### 26.4.2 LD score regression
 
 Inflated test statistics ($\lambda_\text{GC}=\mathrm{median}(\chi^2)/0.455>1$) were once read as evidence of confounding. But polygenicity also inflates them: with thousands of small real effects spread over a correlated genome, *every* variant tags some causal variant. LD score regression (Bulik-Sullivan et al., 2015) separates the two. Suppose each variant has an independent small effect with $\beta_k\sim\mathcal N(0,h^2/M)$. From §26.3, $z_j=\sqrt n\sum_kR_{jk}\beta_k+\text{noise}$, so
+
 $$
 \mathbb E[\chi^2_j]=1+n\sum_kR_{jk}^2\frac{h^2}{M}=1+\frac{n\,h^2}{M}\,\ell_j,\qquad \ell_j=\sum_kR_{jk}^2\ \ (\text{the LD score of variant }j).
 $$
+
 Adding a confounding term that does not depend on LD gives
+
 $$
 \boxed{\ \mathbb E[\chi^2_j]=1+n\,a+\frac{n\,h^2}{M}\ell_j\ }
 $$
+
 **Slope $=nh^2/M$ is polygenic signal; intercept $=1+na$ is confounding.** Variants in high-LD regions tag more causal variants and have larger $\chi^2$; stratification inflates all variants equally regardless of LD. Estimated from summary statistics alone, a regression of $\chi^2_j$ on $\ell_j$ separates the two (with block jackknife standard errors in practice; we show point estimates).
 
 **Experiment** (6,000 SNPs in 300 LD blocks of varying strength, $n=8{,}000$, $h^2=0.40$ with 10% of SNPs causal; two ancestry groups with $F_\text{ST}=0.03$ and a 0.3-SD environmental difference):
@@ -93,13 +104,17 @@ Even without any confounding, $\lambda_\text{GC}=1.60$: *genomic inflation alone
 ### 26.4.3 A linear mixed model is ridge regression
 
 Relatedness and fine-scale structure are handled by the **linear mixed model** (LMM): $y=g+\varepsilon$ with a random genetic effect $g\sim\mathcal N(0,\sigma_g^2K)$ and $K=XX^\top/M$ the genetic relatedness matrix, $\varepsilon\sim\mathcal N(0,\sigma_e^2I)$ (the model behind GCTA, GEMMA, BOLT-LMM, REGENIE; Yang et al., 2011). The best linear unbiased predictor of the genetic value is
+
 $$
 \hat g=\sigma_g^2K\,(\sigma_g^2K+\sigma_e^2I)^{-1}y .
 $$
+
 Since $\sigma_g^2K+\sigma_e^2I=\tfrac{\sigma_g^2}{M}\big(XX^\top+\lambda I\big)$ with $\lambda=\sigma_e^2M/\sigma_g^2$,
+
 $$
 \hat g=\tfrac{\sigma_g^2}{M}XX^\top\tfrac{M}{\sigma_g^2}(XX^\top+\lambda I)^{-1}y=X\underbrace{X^\top(XX^\top+\lambda I)^{-1}y}_{\hat\beta_\text{ridge}} .
 $$
+
 *The LMM's genetic value is the fitted value of ridge regression with penalty $\lambda=\sigma_e^2M/\sigma_g^2$*, equivalently Gaussian-prior MAP estimation of $\beta\sim\mathcal N(0,\sigma_g^2/M\,I)$ (Chapter 7) and a Gaussian process with a linear kernel (Chapter 7). Numerically (400 individuals, 1,500 SNPs) the maximum absolute difference between the two fitted vectors is $5.9\times10^{-7}$ (float32 precision). The consequence for ML: *the standard genetic-statistics workhorse is a linear model with an $\ell_2$ prior*, and any proposed deep model must be compared with it (a strong baseline that is also well calibrated for relatedness).
 
 ---
@@ -107,9 +122,11 @@ $$
 ## 26.5 Fine-mapping: from a locus to a variant
 
 Fine-mapping asks, *given association signal at a locus, which variants are causal?* The simplest model assumes **one** causal variant per locus. For each candidate $j$, let $\hat\beta_j\sim\mathcal N(\beta_j,V)$ with $V=1/n$ and place the prior $\beta_j\sim\mathcal N(0,W)$ under "$j$ is causal". The marginal likelihood under that hypothesis is $\mathcal N(\hat\beta_j;0,V+W)$ against $\mathcal N(\hat\beta_j;0,V)$ under the null, giving the **Wakefield approximate Bayes factor**
+
 $$
 \mathrm{BF}_j=\sqrt{\frac{V}{V+W}}\ \exp\!\Big(\frac{z_j^2}{2}\cdot\frac{W}{V+W}\Big).
 $$
+
 With prior inclusion probabilities $\pi_j$, the **posterior inclusion probability** (PIP) under the single-causal-variant model is $\mathrm{PIP}_j=\pi_j\mathrm{BF}_j/\sum_k\pi_k\mathrm{BF}_k$, and the **95% credible set** is the smallest set of variants whose PIPs sum to at least 0.95. Because $\mathrm{BF}$ is monotone in $|z|$, *with a uniform prior, the PIP ranking is the $|z|$ ranking*; what the Bayesian computation adds is **calibrated uncertainty**: how much probability mass is shared among LD partners. Multi-causal extensions are SuSiE (the "sum of single effects" model fitted by iterative Bayesian stepwise selection; Wang et al., 2020), FINEMAP (Benner et al., 2016), and others; functionally informed priors $\pi_j$ (PolyFun; Weissbrod et al., 2020) place more mass on variants in relevant annotations. **The prior $\pi_j$ is exactly where sequence-to-function models (Chapters 31 and 32) can enter statistical genetics**: a model's predicted regulatory effect of each variant is an informative prior for causality.
 
 **Experiment** (100 SNPs in an AR(1) LD structure, one causal variant of standardized effect $\beta=0.03$, prior SD 0.05, 400 replicate loci per row; summary statistics sampled from $z\sim\mathcal N(\sqrt nR\beta,R)$):
@@ -134,9 +151,11 @@ A **polygenic score** (PGS, PRS) is a weighted sum of allele dosages, $\mathrm{P
 ### 26.6.1 Expected accuracy
 
 Take $M$ independent standardized variants with $\beta_j\sim\mathcal N(0,h^2/M)$ and OLS estimates $\hat\beta_j=\beta_j+e_j$, $\mathrm{Var}(e_j)\approx1/N$ for a training set of size $N$. The BLUP shrinks each estimate by $s=\frac{h^2/M}{h^2/M+1/N}=\frac{Nh^2}{Nh^2+M}$. For $\mathrm{PGS}=\sum_js\hat\beta_jx_j$ one finds $\mathrm{Cov}(\mathrm{PGS},y)=s\,h^2$ and $\mathrm{Var}(\mathrm{PGS})=s^2(h^2+M/N)=s\,h^2$. The squared correlation is therefore
+
 $$
 \boxed{\ R^2=h^2\cdot\frac{Nh^2}{Nh^2+M}\ }
 $$
+
 (Daetwyler et al., 2008; Dudbridge, 2013), the infinitesimal-model accuracy: it approaches $h^2$ as $N\to\infty$ and is small when $M\gg Nh^2$. For $h^2=0.5$, $M=2{,}000$, and $N=20{,}000$ it equals $0.5\times\frac{10{,}000}{12{,}000}=0.417$. Real traits have *far* fewer effective independent loci than the $\sim10^7$ variants, and effect sizes are heavy-tailed, so effective $M$ is smaller and sparse-prior methods beat the Gaussian one when architecture is sparse; in our simulation (100 causal variants among 2,000, all genotyped) a ridge score achieved $R^2=0.460$ in the discovery population, higher than 0.417 because the architecture is sparser than the infinitesimal model.
 
 ### 26.6.2 Portability: it is tagging, not biology
@@ -159,9 +178,11 @@ In real data, the same mechanism acts together with effect-size heterogeneity (g
 ## 26.7 Causation: Mendelian randomization
 
 Association is not causation. Because alleles are allocated at conception independently of later environment (*conditional on ancestry*), a genetic variant associated with an exposure can serve as an **instrumental variable** for asking whether the exposure causes an outcome. Let $G$ be a variant, $X$ an exposure (a biomarker), $Y$ an outcome, and $U$ unmeasured confounders. Three assumptions: **(1) relevance:** $G$ affects $X$; **(2) independence:** $G$ is independent of $U$; **(3) exclusion restriction:** $G$ affects $Y$ only through $X$. With $Y=\theta X+U+\epsilon$,
+
 $$
 \mathrm{Cov}(G,Y)=\theta\,\mathrm{Cov}(G,X)\ \Rightarrow\ \theta=\frac{\beta_{Y,j}}{\beta_{X,j}}\quad(\text{the Wald ratio for variant }j).
 $$
+
 With many variants, the **inverse-variance-weighted (IVW)** estimator combines the ratios: $\hat\theta_\text{IVW}=\sum_jw_j\hat\beta_{X,j}\hat\beta_{Y,j}\big/\sum_jw_j\hat\beta_{X,j}^2$, $w_j=1/\mathrm{SE}_{Y,j}^2$ (a weighted regression of $\hat\beta_Y$ on $\hat\beta_X$ through the origin). **MR-Egger** adds an intercept (after orienting alleles so $\hat\beta_X>0$): the intercept estimates the average *directional* pleiotropic effect, and the slope remains consistent if the instrument strength is independent of the pleiotropic effect (the InSIDE assumption).
 
 **Experiment** (30 instruments, two non-overlapping samples of 200,000; confounder $U$ affecting both $X$ and $Y$; true causal effect $\theta=0.20$):

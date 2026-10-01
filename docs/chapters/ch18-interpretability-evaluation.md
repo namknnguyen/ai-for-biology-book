@@ -34,9 +34,11 @@ Replace the base at position $i$ by each alternative and record the change: $a_i
 **Saliency** is $\partial f/\partial x_i$; **gradient × input** multiplies by the input value. Gradients are cheap (one backward pass) but are *local*: they describe sensitivity at $\mathbf{x}$, not contribution relative to a baseline, and they vanish where the network saturates.
 
 **Integrated gradients** (Sundararajan et al., 2017) integrate the gradient along a straight path from a *baseline* $\mathbf{x}'$ (an uninformative reference: zeros, a uniform base distribution, a shuffled sequence) to the input:
+
 $$
 \mathrm{IG}_i(\mathbf{x})=(x_i-x'_i)\int_0^1\frac{\partial f\big(\mathbf{x}'+\alpha(\mathbf{x}-\mathbf{x}')\big)}{\partial x_i}\,d\alpha .
 $$
+
 **Completeness** (the key axiom): $\sum_i\mathrm{IG}_i=f(\mathbf{x})-f(\mathbf{x}')$. *Proof.* Let $F(\alpha)=f(\mathbf{x}'+\alpha(\mathbf{x}-\mathbf{x}'))$. By the fundamental theorem of calculus and the chain rule, $f(\mathbf{x})-f(\mathbf{x}')=\int_0^1F'(\alpha)d\alpha=\int_0^1\sum_i(x_i-x_i')\,\partial_if(\cdot)\,d\alpha=\sum_i\mathrm{IG}_i$. $\square$ The attributions *add up* to the difference between the prediction and the baseline prediction, which gradient × input does not guarantee. In practice the integral is approximated by a Riemann sum with 20–300 steps. **The result depends on the baseline**; a poor baseline produces meaningless attributions, so the baseline is part of the claim.
 
 **DeepLIFT** (Shrikumar et al., 2017) propagates *differences from a reference activation* backward through the network using "multipliers" that avoid the saturation problem of gradients (its rescale rule satisfies completeness); it is widely used in genomics (as in BPNet; Chapter 10) with dinucleotide-shuffled references.
@@ -44,9 +46,11 @@ $$
 ### 18.2.3 Shapley values
 
 Treat features as players and the prediction as the "payout." The **Shapley value** of feature $i$ is the average marginal contribution over all orderings:
+
 $$
 \phi_i=\sum_{S\subseteq N\setminus\{i\}}\frac{|S|!\,(n-|S|-1)!}{n!}\Big[v(S\cup\{i\})-v(S)\Big],
 $$
+
 where $v(S)$ is the model's value when only features $S$ are "present." It is the *unique* attribution satisfying efficiency ($\sum\phi_i=v(N)-v(\emptyset)$), symmetry, dummy, and additivity axioms (Shapley, 1953; Lundberg & Lee, 2017). It costs $2^n$ evaluations and requires choosing *how absent features are filled in* (marginal vs. conditional distributions), a choice that changes the answer; approximations (KernelSHAP, DeepSHAP) are used. For sequences, "removing" a nucleotide is not well-defined without a background distribution.
 
 ### 18.2.4 A genomics-specific pitfall: gradients on one-hot inputs
@@ -96,9 +100,11 @@ conformal 90% interval (half-width 0.73): empirical coverage on covariate-shifte
 **Probes** were introduced in Chapter 13: a simple classifier on frozen features measures *accessible* information, with *control tasks* to separate representation quality from probe capacity. Beyond probes, we often want to ask whether *two representations* (two layers, two models, two training runs) contain similar information.
 
 **Centered kernel alignment (CKA)** (Kornblith et al., 2019) compares two sets of representations $\mathbf{X}\in\R^{n\times p}$, $\mathbf{Y}\in\R^{n\times q}$ of the same $n$ inputs. For the linear kernel (columns centered),
+
 $$
 \mathrm{CKA}(\mathbf{X},\mathbf{Y})=\frac{\|\mathbf{Y}^\top\mathbf{X}\|_F^2}{\|\mathbf{X}^\top\mathbf{X}\|_F\,\|\mathbf{Y}^\top\mathbf{Y}\|_F}\in[0,1].
 $$
+
 It is **invariant to orthogonal transformations and isotropic scaling** of either representation (verified: $\mathrm{CKA}(\mathbf{X},\mathbf{X}\mathbf{Q})=1.000$ and $\mathrm{CKA}(\mathbf{X},3\mathbf{X})=1.000$) and therefore insensitive to the *rotation non-identifiability* of latent axes (Chapter 8). It is **not** invariant to general invertible linear maps ($\mathrm{CKA}(\mathbf{X},\mathbf{X}\mathbf{M})=0.691$ for a random invertible $\mathbf{M}$), and unrelated representations give a small value (0.038). Use CKA (or CCA) to ask "do these two models encode the *same subspace*?" rather than comparing axes (Worked Example 8.2). Caveat: CKA is dominated by high-variance directions, so two representations can score high while differing in low-variance but task-relevant directions.
 
 ---
@@ -112,10 +118,12 @@ Chapter 2 (§2.7.1) showed that a $d$-dimensional space holds many more than $d$
 ### 18.4.2 Sparse autoencoders
 
 A **sparse autoencoder (SAE)** is trained on a model's internal activations $\mathbf{h}\in\R^d$ to find an *overcomplete* dictionary of $m>d$ directions in which each activation is a *sparse* combination:
+
 $$
 \mathbf{f}=\mathrm{ReLU}\big(\mathbf{W}_e\mathbf{h}+\mathbf{b}_e\big),\qquad\hat{\mathbf{h}}=\mathbf{W}_d\mathbf{f},\qquad
 \mathcal{L}=\|\mathbf{h}-\hat{\mathbf{h}}\|^2+\lambda\|\mathbf{f}\|_1,
 $$
+
 with unit-norm decoder columns so that the L1 penalty cannot be cheated by rescaling. The hope: each decoder column corresponds to one *monosemantic feature* (Bricken et al., 2023; Cunningham et al., 2023). This is dictionary learning (sparse coding), a technique with decades of history, applied to neural activations.
 
 **A toy test with ground truth.** We generate sparse features, each active with probability 0.02–0.03 with random magnitude, embed them into $d=8$ dimensions through random unit-norm directions, and train SAEs on the resulting activations. We ask how many *true* directions appear (cosine > 0.9) among the learned decoder columns:

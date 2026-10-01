@@ -50,9 +50,11 @@ Use three levels.
 Then **place the idea on the Claim Ladder**: the *planned* evidence reaches which rung (C0–C4)? If the headline claim is C3 or C4 but the planned experiments reach only C1, either the claim must be weakened or the experiments strengthened. For a model-building idea, ask the **delta question**: *compared with the strongest baseline at equal cost, what improvement would make the community change what it uses?* A 2% gain on a benchmark that is already within 10% of its noise ceiling does not change practice (Chapter 24).
 
 **The value-of-information view.** Let a decision have options $a\in\mathcal A$ with utility $U(a,\theta)$ for unknown $\theta$. The expected value of learning $\theta$ before deciding is
+
 $$
 \mathrm{EVPI}=\mathbb E_\theta\Big[\max_aU(a,\theta)\Big]-\max_a\mathbb E_\theta\big[U(a,\theta)\big]\ \ge 0 .
 $$
+
 It is zero when one option dominates for every $\theta$: *if the decision would not change, the experiment is not worth doing, however interesting*. For research, this is a useful test: write the decision (which target to pursue, which model to use, which perturbation set to run) and ask whether any plausible result would flip it.
 
 ---
@@ -62,9 +64,11 @@ It is zero when one option dominates for every $\theta$: *if the decision would 
 **Data.** Does it exist (public, licensed, obtainable), at the needed size and quality? What is its noise ceiling and leakage structure (Chapters 1, 27, 28)? If it must be generated: who runs the experiment, at what cost and turnaround, and with which controls? *Time to first signal* matters more than total time.
 
 **Compute.** For a dense neural model, training compute is approximately
+
 $$
 C\approx6\,N\,D\ \text{FLOPs}
 $$
+
 ($N$ parameters, $D$ training tokens or examples; Chapter 17). Divide by the sustained throughput of your hardware, typically 30–50% of peak. Two reference computations (back-of-envelope; hardware figures are rough and rapidly improving):
 
 * A 100-million-parameter model on $10^{10}$ tokens: $C=6\times10^{18}$ FLOPs. At an effective $1.25\times10^{14}$ FLOP/s (about 40% of a 312-TFLOP/s accelerator) that is $4.8\times10^4$ s, about **13 hours on one GPU**.
@@ -82,9 +86,11 @@ The first tells you that a single researcher can train many small models and run
 ## 56.5 Decisiveness: expected information gain
 
 Suppose there are competing hypotheses $H_1,\dots,H_K$ with prior probabilities $\pi_k$ and a candidate experiment with outcomes $o$ whose likelihood under hypothesis $k$ is $P(o\mid H_k)$. The **expected information gain** (EIG) of the experiment is the mutual information between hypothesis and outcome,
+
 $$
 \mathrm{EIG}=I(H;O)=H(\pi)-\mathbb E_o\big[H(\pi(\cdot\mid o))\big],
 $$
+
 the expected reduction in entropy of the posterior (Chapter 5; Lindley, 1956). It is zero if all hypotheses predict the same outcome distribution, and it is bounded by $H(\pi)$ (the experiment can at best settle the question). *EIG per unit cost* ranks experiments for a single step; sequential designs choose greedily or by lookahead (Chapter 46).
 
 ### 56.5.1 A worked computation

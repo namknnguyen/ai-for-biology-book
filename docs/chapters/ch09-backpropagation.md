@@ -45,9 +45,11 @@ It says a good network *exists*. It does not say (i) how many units are needed (
 ### 9.2.1 The single-example derivation
 
 Define the **error signal** (or *delta*) at layer $\ell$:
+
 $$
 \boldsymbol\delta^{(\ell)}\;:=\;\frac{\partial\mathcal{L}}{\partial\mathbf{z}^{(\ell)}}\in\R^{d_\ell}.
 $$
+
 All parameter gradients are simple functions of the deltas, so the task reduces to computing the deltas.
 
 **Step 1: output layer.** For the common cases, $\boldsymbol\delta^{(L)}$ is known in closed form. For softmax cross-entropy (Chapter 3, §3.3.1), $\boldsymbol\delta^{(L)}=\mathbf{p}-\mathbf{e}_y$. For squared error with a linear output, $\boldsymbol\delta^{(L)}=\hat{\mathbf{y}}-\mathbf{y}$.
@@ -68,14 +70,18 @@ $$
 This is the **backward recursion**: multiply the error signal by the *transposed* weights (spreading blame to the units that contributed) and by the local derivative of the nonlinearity ($\odot$ is elementwise).
 
 **Step 3: parameter gradients.** Since $z^{(\ell)}_j=\sum_kW^{(\ell)}_{jk}a^{(\ell-1)}_k+b^{(\ell)}_j$,
+
 $$
 \frac{\partial\mathcal{L}}{\partial W^{(\ell)}_{jk}}=\delta^{(\ell)}_j\,a^{(\ell-1)}_k,\qquad
 \frac{\partial\mathcal{L}}{\partial b^{(\ell)}_j}=\delta^{(\ell)}_j,
 $$
+
 i.e.,
+
 $$
 \boxed{\nabla_{\mathbf{W}^{(\ell)}}\mathcal{L}=\boldsymbol\delta^{(\ell)}\,\mathbf{a}^{(\ell-1)\top},\qquad\nabla_{\mathbf{b}^{(\ell)}}\mathcal{L}=\boldsymbol\delta^{(\ell)}.}
 $$
+
 A weight's gradient is *(blame at its output unit) × (activity at its input unit)*: a Hebbian-looking outer product.
 
 ### 9.2.2 The batched version, with shapes
@@ -108,9 +114,11 @@ Backprop for MLPs is a special case of **reverse-mode automatic differentiation*
 
 1. **Forward pass.** Evaluate each node in topological order, recording for every operation what it needs for its local derivative (inputs, outputs, masks).
 2. **Backward pass.** Initialize $\bar{\mathcal{L}}=\partial\mathcal{L}/\partial\mathcal{L}=1$. Visit nodes in *reverse* topological order. For each node $v$ with children $c$ (nodes that consume $v$), accumulate
+
 $$
 \bar v\;=\;\sum_{c}\bar c\;\frac{\partial c}{\partial v}\qquad(\text{the multivariate chain rule: sum over all paths}).
 $$
+
 Each operation implements one function: given the upstream gradient $\bar c$, return the gradients for its inputs.
 
 **Fan-out requires accumulation.** If a value is used twice (a residual connection, a shared weight, a repeated token), its gradient is the *sum* of contributions from each use. Forgetting to accumulate (overwriting instead of adding) is a classic bug.
@@ -147,21 +155,27 @@ C. RMS activation at layer 50 and RMS gradient at layer 1 (width 256, ReLU):
 ### 9.4.1 The product of Jacobians
 
 The gradient reaching an early layer is a *product* of per-layer Jacobians:
+
 $$
 \frac{\partial\mathcal{L}}{\partial\mathbf{a}^{(\ell)}}=\Big(\prod_{k=\ell+1}^{L}\mathbf{W}^{(k)\top}\,\mathrm{diag}\big(\sigma'(\mathbf{z}^{(k-1)})\big)\Big)\,\frac{\partial\mathcal{L}}{\partial\mathbf{a}^{(L)}} .
 $$
+
 If the typical factor has gain $g<1$ in each layer, the gradient shrinks like $g^{L-\ell}$ (**vanishing**); if $g>1$ it grows like $g^{L-\ell}$ (**exploding**). With sigmoid ($\sigma'\le1/4$) vanishing is nearly guaranteed in deep networks; this was the main obstacle to training deep networks before ReLU, careful initialization, normalization, and residual connections. Recurrent networks multiply the *same* matrix many times, making the problem acute (Chapter 11).
 
 ### 9.4.2 Variance-preserving initialization (He, Xavier)
 
 Choose initial weights so that signal and gradient scales neither shrink nor grow across layers. Take $\mathbf{W}^{(\ell)}$ with i.i.d. zero-mean entries of variance $\sigma_w^2$, inputs $a_k^{(\ell-1)}$ with second moment $\E[a^2]$ and independent of weights. Then
+
 $$
 \Var\big(z^{(\ell)}_j\big)=\sum_{k=1}^{n_\text{in}}\Var(W_{jk})\,\E[a_k^2]=n_\text{in}\,\sigma_w^2\,\E[a^2].
 $$
+
 For ReLU, $a=\max(0,z)$ with $z$ symmetric about zero, so $\E[a^2]=\tfrac12\E[z^2]=\tfrac12\Var(z^{(\ell-1)})$. Hence
+
 $$
 \Var(z^{(\ell)})=\frac{n_\text{in}\sigma_w^2}{2}\,\Var(z^{(\ell-1)}),
 $$
+
 and the variance is preserved across layers if **$\sigma_w^2=2/n_\text{in}$** (**He initialization**, He et al., 2015). The analogous argument for the backward pass (preserving gradient variance) gives $\sigma_w^2=2/n_\text{out}$; **Xavier/Glorot** initialization, $\sigma_w^2=2/(n_\text{in}+n_\text{out})$ (for tanh-like activations with $\E[a^2]\approx\Var(z)$ giving $1/n_\text{in}$ per direction), compromises between the two.
 
 **Numerical confirmation (Part C of the code).** Width 256, 50 ReLU layers:
@@ -180,10 +194,12 @@ and the variance is preserved across layers if **$\sigma_w^2=2/n_\text{in}$** (*
 ### 9.5.1 Normalization layers
 
 **LayerNorm** (Ba et al., 2016) normalizes each example's feature vector $\mathbf{x}\in\R^d$ across features:
+
 $$
 \mathrm{LN}(\mathbf{x})=\boldsymbol\gamma\odot\frac{\mathbf{x}-\mu(\mathbf{x})}{\sqrt{\sigma^2(\mathbf{x})+\epsilon}}+\boldsymbol\beta,\qquad
 \mu=\tfrac1d\sum_ix_i,\quad\sigma^2=\tfrac1d\sum_i(x_i-\mu)^2 .
 $$
+
 **RMSNorm** drops the mean subtraction: $\mathbf{x}/\sqrt{\tfrac1d\sum_ix_i^2+\epsilon}\odot\boldsymbol\gamma$. **BatchNorm** (Ioffe & Szegedy, 2015) normalizes each feature across the *batch*.
 
 **Why they help.** (i) They re-center and rescale activations at every layer, so the scale of the pre-activations does not drift through depth (§9.4); (ii) $\mathrm{LN}(c\,\mathbf{x})=\mathrm{LN}(\mathbf{x})$ for $c>0$: the output is *invariant to the scale of the weights before it*, so the gradient is orthogonal to the weight vector and the effective learning rate adapts as weight norms grow (Arora et al., 2019); (iii) they improve the conditioning of the loss (Chapter 3).
@@ -193,9 +209,11 @@ $$
 ### 9.5.2 Residual connections
 
 A **residual block** computes $\mathbf{y}=\mathbf{x}+F(\mathbf{x})$ (He et al., 2016). Its Jacobian is
+
 $$
 \frac{\partial\mathbf{y}}{\partial\mathbf{x}}=\mathbf{I}+\frac{\partial F}{\partial\mathbf{x}},
 $$
+
 so the gradient to $\mathbf{x}$ contains the *identity* term: the upstream gradient flows through unchanged *in addition to* whatever $F$ contributes. Across $L$ blocks, $\prod_\ell(\mathbf{I}+\mathbf{J}_\ell)$ expands into a sum over $2^L$ paths, including the all-identity path, so gradients reach the earliest layer undiminished. Veit et al. (2016) interpret residual networks as ensembles of shallow paths. This is why *every* modern deep architecture (ResNets, transformers, AlphaFold's Evoformer, diffusion U-Nets) is built from residual blocks. In **pre-LN transformers**, $\mathbf{y}=\mathbf{x}+F(\mathrm{LN}(\mathbf{x}))$ keeps the identity path completely clean and is markedly more stable at depth than post-LN, which is why most large models use it.
 
 **Biological intuition for residual stacks.** A residual stream is a "communication channel" onto which each layer *writes small updates*; later layers read what earlier layers wrote. Mechanistic interpretability (Chapters 18, 48) exploits this additive structure: the final representation is a sum of layer contributions, which can be attributed.

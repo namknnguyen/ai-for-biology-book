@@ -107,9 +107,11 @@ This section dissects the main published systems using the book's template, abbr
 An agent can run in an hour as many analyses as a human analyst runs in a year. Every analysis has choices (which predictor, which subgroup, which transform, which outlier rule, which covariates), and a report that describes only the path that "worked" has the statistical properties of the best of many tests. This is the *garden of forking paths* (Gelman and Loken) and the *p-hacking* of Simmons, Nelson and Simonsohn, now without fatigue to limit it.
 
 **The arithmetic.** If a dataset is null and the agent tries $M$ independent tests at level $\alpha$, the probability of reporting at least one "hit" is
+
 $$
 1-(1-\alpha)^M ,
 $$
+
 which is 0.23 for $M=5$, 0.64 for $M=20$, and 0.99 for $M=100$. Variants of an analysis are not independent, so the effective number of tests $M_\text{eff}$ is smaller than the number tried: it is set by the correlations among the statistics. Two corrections apply: *Bonferroni* ($p\cdot M$) is valid for any dependence but conservative when variants are correlated; **max-T permutation** is exact: shuffle the outcome, rerun *the entire logged set of analyses*, and record the *smallest* p-value each time; the 5th percentile of those minima is the threshold for "the best of everything tried" to be called significant. The procedure treats the agent's search as the statistic. Its price is power: the same effect must be larger to clear a threshold set by 200 variants than a threshold set by one.
 
 The experiment below uses 60 samples, 20 correlated candidate predictors, and a binary covariate, and defines 200 analysis variants (predictor × five subgroups × two transforms). Half of the simulated datasets are null; in the other half predictor 0 truly affects the outcome ($\beta=0.45$).
@@ -165,17 +167,21 @@ N candidates   judge-selected   random   oracle (best 3 by true value)
 ## 54.4 Judge drift: Goodhart's law for hypotheses
 
 The second mechanism concerns selection among hypotheses. Suppose a judge $J$ scores each hypothesis, and the loop keeps what scores well and then mutates it (the *Evolution* agent of Co-Scientist, or any generate-critique-refine loop). Write the judge's score as
+
 $$
 J = v + w\,f + \varepsilon,
 $$
+
 where $v$ is the hypothesis's true value (probability that it is true and useful), $f$ is a feature the judge likes that is *not* value (persuasiveness, fluency, resemblance to published claims, mention of fashionable mechanisms), $w$ is the weight the judge puts on it, and $\varepsilon$ is noise. Nothing in this model requires the judge to be *bad*: language-model judges and human reviewers have non-zero $w$.
 
 **Selection alone.** If one chooses the top $k$ of $N$ by $J$, the mean true value of the selection grows with $N$ but saturates: the winner's curse of Chapter 43. The best candidates by $J$ are enriched for high $v$, high $f$, and high $\varepsilon$ in proportions set by their variances.
 
 **Selection plus variation: the breeder's equation.** In an evolution loop, each round selects survivors and *re-expands* them with mutations (here: changes to the hypothesis proposed by the generator). The response of a trait to selection is the selection differential times the fraction of the *heritable* variation in $J$ that belongs to that trait. If a mutation changes $v$ with standard deviation $\sigma_v$ and $f$ with $\sigma_f$, the share of each round's gain that is real is approximately
+
 $$
 \frac{\Delta \bar v}{\Delta \bar J}\;\approx\;\frac{\sigma_v^{2}}{\sigma_v^{2}+w^{2}\sigma_f^{2}} .
 $$
+
 Truth is hard to move (a mutation that improves the hypothesis's *correctness* requires new information about the world); persuasiveness is easy to move (rewording, adding mechanism, citing more). Even with an unbiased-looking judge ($w=1$), if $\sigma_f$ is four times $\sigma_v$ the real share of the gain is $1/(1+16)\approx 6\%$ and the judge's score therefore overstates progress by about $17\times$. The *tournament Elo goes up* because the loop is working; whether *truth* goes up depends on $w\sigma_f/\sigma_v$.
 
 !!! math "Derivation: the share of real gain"

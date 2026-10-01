@@ -47,9 +47,11 @@ Twenty standard amino acids share a backbone (N–C$\alpha$–C′) and differ i
 ### 23.3.2 Marginal stability and the sigmoid
 
 The native state is stable by a *small margin*. Let $\Delta G$ be the folding free energy (negative = stable). In the two-state approximation the fraction of molecules in the folded state is
+
 $$
 f_\text{folded}=\frac{1}{1+e^{\Delta G/RT}},\qquad RT=0.593\ \text{kcal/mol at }298\,\text{K}.
 $$
+
 Typical globular proteins have $\Delta G\approx-5$ to $-10$ kcal/mol, which results from large opposing contributions (the favorable hydrophobic effect, packing, and hydrogen bonding; the unfavorable loss of conformational entropy). The sigmoid has consequences:
 
 | $\Delta G$ (kcal/mol) | $-8$ | $-5$ | $-3$ | $-1$ | $0$ | $+1$ |
@@ -63,9 +65,11 @@ Typical globular proteins have $\Delta G\approx-5$ to $-10$ kcal/mol, which resu
 ### 23.3.3 Global epistasis: derived and tested
 
 Suppose each mutation $m$ shifts the latent stability by an *additive* amount $\Delta\Delta G_m$, so a genotype with mutations $\{m_1,\dots,m_k\}$ has $\Delta G=\Delta G_\text{wt}+\sum_j\Delta\Delta G_{m_j}$ (a good first approximation for distant sites). The *measured* phenotype is a nonlinear function of the latent value: $f=g(\Delta G)$, with $g$ the sigmoid above (or, for an enzyme with a stability requirement, a product of stability and intrinsic activity). Then **epistasis appears on the measured scale even though the latent model is perfectly additive**: for two mutations A and B,
+
 $$
 \epsilon_{AB}=f_{AB}-(f_A+f_B-f_\text{wt})\ne0\quad\text{generically, because }g\text{ is nonlinear.}
 $$
+
 This is **global epistasis** (Sailer & Harms, 2017; Otwinowski et al., 2018; Starr & Thornton, 2016): non-specific, nonlinearity-induced interactions, in contrast to *specific epistasis* arising from physical contacts between residues. Two consequences: (i) the *shape* of the genotype–phenotype map is partly a property of the *assay's response function*, and (ii) an additive model on the measured scale systematically fails for multi-mutants, while an additive latent model with a learned nonlinearity succeeds.
 
 **Experiment** (`code/ch23_global_epistasis.py`). A 40-site, 20-amino-acid synthetic protein with additive $\Delta\Delta G$ (mean $\sim+0.96$ kcal/mol; 15% stabilizing). We train on all single mutants plus 3,000 random double mutants and test on held-out 3- to 6-fold mutants, comparing (a) an additive model on the measured scale (least squares) and (b) an additive latent stability model passed through a learned sigmoid.

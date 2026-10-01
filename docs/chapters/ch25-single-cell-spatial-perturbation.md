@@ -35,16 +35,20 @@ Tissue is dissociated (enzymatically or mechanically) to single cells or isolate
 ### 25.2.2 The measurement model: binomial thinning of a bursty process
 
 Let $m_{cg}$ be the (unobserved) number of mRNA molecules of gene $g$ in cell $c$. Chapter 19 showed that bursty transcription gives $m_{cg}\sim\mathrm{NB}$ with mean $\mu_g$ and dispersion $\phi_g$ (variance $\mu_g+\phi_g\mu_g^2$), equivalently Gamma–Poisson. Capture selects each molecule independently with probability $p_c$:
+
 $$
 y_{cg}\mid m_{cg}\sim\mathrm{Binomial}(m_{cg},p_c).
 $$
 
 !!! math "Thinning preserves the negative binomial"
     For $m\sim\mathrm{NB}(\mu,\phi)$ and $y\mid m\sim\mathrm{Bin}(m,p)$: $\mathbb E[y]=p\mu$, and by the law of total variance
+
     $$
     \mathrm{Var}(y)=\mathbb E[\mathrm{Var}(y\mid m)]+\mathrm{Var}(\mathbb E[y\mid m])=p(1-p)\mu+p^2(\mu+\phi\mu^2)=p\mu+\phi(p\mu)^2 .
     $$
+
     So $y\sim\mathrm{NB}(p\mu,\phi)$ with the *same* dispersion $\phi$ (the full Gamma–Poisson argument gives the distribution, not only the moments). Capture rescales the mean and leaves the *relative* overdispersion unchanged. Hence the probability of a zero is
+
     $$
     P(y=0)=(1+\phi\,p\mu)^{-1/\phi}\ \xrightarrow{\phi\to0}\ e^{-p\mu}.
     $$
@@ -57,9 +61,11 @@ $$
 ### 25.2.3 The per-cell noise ceiling
 
 For a gene with true mean molecule count $\mu$ and capture $p$, the biological cell-to-cell signal in the expected count $p\,m$ has variance $p^2\phi\mu^2$, and the total variance of $y$ is $p\mu+\phi p^2\mu^2$. Let $\lambda=p\mu$ be the mean UMI count. The fraction of variance in a single cell's observed count that reflects the cell's true molecule number, i.e. the **per-cell reliability** (and the maximum $R^2$ any model could achieve against a single-cell count), is
+
 $$
 \rho(\lambda)=\frac{\phi\lambda^2}{\lambda+\phi\lambda^2}=\frac{\phi\lambda}{1+\phi\lambda}.
 $$
+
 At $\phi=0.2$: $\lambda=0.1\Rightarrow\rho=0.02$; $\lambda=1\Rightarrow0.17$; $\lambda=10\Rightarrow0.67$. In simulation, averaging over genes in each bin gives:
 
 | Mean UMI per cell | Genes | Observed zeros | NB-predicted zeros | Poisson-predicted zeros | Per-cell reliability $\rho$ |
@@ -79,9 +85,11 @@ Because $p_c$ (and total RNA content) vary between cells, raw counts are not com
 
 !!! math "The compositional artifact"
     Let a set of genes carrying a fraction $f$ of the molecules be multiplied by $\rho$ between two conditions, with all other genes unchanged in absolute number. The new total is $1+f(\rho-1)$ (relative to the old), so every unchanged gene's *share* is multiplied by $1/(1+f(\rho-1))$ and its apparent log$_2$ fold change is
+
     $$
     \log_2\mathrm{FC}_\text{apparent}=-\log_2\big(1+f(\rho-1)\big).
     $$
+
     For $f=0.3$, $\rho=3$: $-\log_2(1.6)=-0.68$.
 
 In simulation, 52 genes carrying 30% of the molecules were tripled in condition B; the other 2,234 well-detected genes were unchanged. CPM normalization gave a median apparent log$_2$FC of **−0.68** for the unchanged genes (91% of them below −0.5, i.e. "down-regulated"), exactly as derived; a **median-ratio** normalization (the DESeq2-style assumption that most genes are unchanged) gave +0.00. *No normalization is assumption-free*: median-ratio fails when more than half of the genes change; spike-ins or cell counting are needed to recover *absolute* change. This is the molecular version of the "closure" problem for compositional data, and it matters for foundation models because **a model trained on normalized shares inherits the compositional coupling** and may represent "gene A is up" as "all other genes are down".
@@ -147,9 +155,11 @@ Tissue structure matters because cell identity is partly *defined* by neighbors 
 ### 25.4.1 A spot is a mixture: deconvolution and its failure modes
 
 For a capture spot containing $n_k$ cells of type $k$ with RNA content $c_k$ and gene-fraction signature $S_{\cdot k}$ (a column of a $G\times K$ matrix with each column summing to 1), the expected expression of the spot is
+
 $$
 \mathbb E[y_{s}]=D_s\,\frac{\sum_kn_{k}c_{k}\,S_{\cdot k}}{\sum_kn_{k}c_{k}}\ \odot\ b,
 $$
+
 with $D_s$ the depth and $b$ a vector of platform-specific gene efficiencies. *Deconvolution* (cell2location, Kleshchevnikov et al., 2022; RCTD, Cable et al., 2022; Tangram, Biancalani et al., 2021) estimates the mixture weights from a single-cell **reference** by (constrained) regression; the simplest version is non-negative least squares. Three failure modes follow directly from this equation and were tested in simulation (5 cell types, 300 genes, 3–14 cells per spot, true mixtures from a Dirichlet):
 
 | UMI per spot | Matched reference | Reference from another platform ($b$, log-SD 0.5) | Reference *missing* one cell type |

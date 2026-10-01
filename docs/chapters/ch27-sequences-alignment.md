@@ -23,16 +23,20 @@ The **classical pipeline** is: reads → quality control → alignment to the re
 ## 27.2 Scoring alignments: scores are log-likelihood ratios
 
 An alignment aligns two sequences by matching residues, allowing substitutions and gaps. For the best alignment under an additive score, dynamic programming (Chapter 6) solves it in $O(mn)$ time: for local alignment (Smith–Waterman),
+
 $$
 H_{ij}=\max\{0,\ H_{i-1,j-1}+s(a_i,b_j),\ H_{i-1,j}-g,\ H_{i,j-1}-g\},
 $$
+
 and the alignment score is $\max_{ij}H_{ij}$ (affine gap penalties add a state, giving the three-matrix Gotoh algorithm). What are the numbers $s(a,b)$? They are not arbitrary:
 
 !!! math "Substitution scores as log-odds"
     Let $p_a$ be the background frequency of residue $a$, and $q_{ab}$ the frequency with which $a$ and $b$ are aligned in *truly homologous* sequences. A homology hypothesis is tested by the likelihood ratio $q_{ab}/(p_ap_b)$ of a pair; the log of the product over aligned positions is the sum of
+
     $$
     s(a,b)=\frac1\lambda\ln\frac{q_{ab}}{p_ap_b},\qquad\text{equivalently}\qquad q_{ab}=p_ap_b\,e^{\lambda s(a,b)}.
     $$
+
     Because the $q_{ab}$ sum to one, $\lambda$ is the unique positive solution of $\sum_{a,b}p_ap_b\,e^{\lambda s(a,b)}=1$ (*Karlin & Altschul, 1990*). The expected score per aligned pair is *negative* under the background ($-\tfrac1\lambda\mathrm{KL}(pp\Vert q)$) and positive under homology: $\mathbb E_q[s]=H/\lambda$, with $H=\mathrm{KL}(q\Vert pp)$ the **relative entropy**, the information in nats that one aligned pair carries for homology versus chance (Chapter 5).
 
 The widely used **BLOSUM** matrices (Henikoff & Henikoff, 1992) and earlier PAM matrices (Dayhoff et al., 1978) were estimated by exactly this reasoning from blocks of aligned protein families (BLOSUM62: clustering sequences at 62% identity). Using BLOSUM62 with Robinson–Robinson background frequencies we find (`code/ch27_alignment.py`): expected score per pair under the background $-0.938$; $\lambda=0.3172$ (the value in NCBI's BLAST statistics for BLOSUM62 is about 0.318); relative entropy $H=0.386$ nats, i.e. **0.56 bits per aligned pair**. *Each aligned residue pair carries about half a bit of evidence for homology*: a significant alignment needs many aligned positions, which is why short motifs cannot be detected by sequence alignment alone, and why a *profile* (a position-specific score matrix or HMM, $q$ estimated per column of an alignment) detects remote homologs that single-sequence BLOSUM-based searches miss.
@@ -42,9 +46,11 @@ The widely used **BLOSUM** matrices (Henikoff & Henikoff, 1992) and earlier PAM 
 ## 27.3 Significance: Karlin–Altschul statistics and E-values
 
 Given a scoring system, how high must a score be to be unlikely among unrelated sequences? For *ungapped* local alignment of random sequences of lengths $m,n$, local alignments are rare excursions of a random walk with negative drift, and the number of distinct alignments with score $\ge S$ is approximately Poisson with mean
+
 $$
 \boxed{\ E=K\,m\,n\,e^{-\lambda S}\ }
 $$
+
 (Karlin & Altschul, 1990; the **E-value**). Two consequences follow. **(i)** The maximum score $S_\max$ is **Gumbel-distributed**: $P(S_\max\ge S)=1-\exp(-Kmn\,e^{-\lambda S})$ with location $\ln(Kmn)/\lambda$ and scale $1/\lambda$, so the standard deviation is $\pi/(\lambda\sqrt6)$. **(ii)** A *bit score* $S'=(\lambda S-\ln K)/\ln2$ puts all scoring systems on a common scale, with $E=mn\,2^{-S'}$; searching a database of $N$ sequences multiplies $E$ by $N$ (a Bonferroni-type correction for the number of comparisons). The length required for significance follows from setting $E\approx1$: the alignment must contain roughly $\ln(Kmn)/H$ positions: for a 300-residue query against a $10^8$-residue database, $\ln(10^{10})/0.386\approx60$ well-conserved positions.
 
 **Experiment.** We test the theory by brute force: $4{,}000$ random sequence pairs (length 250, background frequencies of amino acids), maximum ungapped local score via the diagonal DP.
@@ -79,9 +85,11 @@ Aligning every read to the genome by dynamic programming is impossible ($10^9$ r
 **Seed-and-extend.** BLAST (Altschul et al., 1990) finds short exact or near-exact **word hits** (seeds) using an index, and only then performs DP around those seeds. Statistics: if two sequences share a true alignment with identity $\pi$ over length $L$, the probability of at least one exact seed of length $k$ is high when $\pi^k$ is not small; a smaller $k$ gives more sensitivity and more spurious hits. Modern long-read mappers use *minimizers* (minimap2; Li, 2018) to subsample seeds.
 
 **The Burrows–Wheeler transform and FM-index.** For a text $T$ ending with a unique sentinel \$, sort all suffixes (the **suffix array** $SA$) and let the **BWT** be the character preceding each suffix: $\mathrm{BWT}[i]=T[SA[i]-1]$. The suffixes starting with a pattern $P$ form a contiguous interval $[lo,hi)$ of $SA$. The **LF-mapping** (the $i$-th occurrence of character $c$ in the last column corresponds to the $i$-th occurrence of $c$ in the first column) gives **backward search**: process $P$ right to left; if the current interval for the suffix $P[j+1..m]$ is $[lo,hi)$, then the interval for $cP[j+1..m]$ is
+
 $$
 lo'=C[c]+\mathrm{Occ}(c,lo),\qquad hi'=C[c]+\mathrm{Occ}(c,hi),
 $$
+
 where $C[c]$ is the number of text symbols smaller than $c$ and $\mathrm{Occ}(c,i)$ the number of $c$ in $\mathrm{BWT}[0..i)$. The pattern occurs $hi-lo$ times, found in **$m$ rank operations, independent of the genome size** (Ferragina & Manzini, 2000; Burrows & Wheeler, 1994). With rank/select structures and a sampled suffix array, the index of the human genome fits in a few gigabytes (BWA, Bowtie; Li & Durbin, 2009; Langmead et al., 2009). Allowing mismatches means branching in the backward search (cost grows with the number of allowed errors) or using seeds plus extension.
 
 **Experiment.** We built the suffix array (by prefix doubling), the BWT, and the Occ table for a random 200,000-base genome and compared backward-search counts with brute-force counting for 300 random patterns of length 6–13: **0 mismatches**, as it must be (the index is an exact data structure). This is mundane but important: *classical algorithms are exact where learned models are approximate*; the speed-up comes from a data-structure insight, not from approximation.
@@ -114,10 +122,12 @@ Reads from unique sequence map essentially perfectly at any length; reads from r
 ## 27.6 Variant calling: genotype likelihoods and what depth cannot fix
 
 At a site covered by $d$ reads, $k$ of which show the alternative allele, a **genotype likelihood** under independent errors (per-base error rate $e$) is binomial. For the three diploid genotypes with alternative-allele fraction $\theta_g\in\{e,\tfrac12,1-e\}$,
+
 $$
 P(k\mid g)=\binom dk\theta_g^k(1-\theta_g)^{d-k},\qquad
 P(g\mid\text{reads})\propto P(k\mid g)\,\pi_g,
 $$
+
 where $\pi_g$ is the Hardy–Weinberg prior with alternative allele frequency $p$: $\pi=((1-p)^2,\ 2p(1-p),\ p^2)$ (Li, 2011). The genotype with the highest posterior is called. Per-read base quality $Q$ replaces $e$ read by read, and mapping quality discounts reads whose placement is uncertain. This is the model behind the SAMtools/GATK family; **DeepVariant** (Poplin et al., 2018) replaces the hand-built model by a convolutional network on images of the read pileup around the candidate, learning the error modes from truth sets (it won the 2016 PrecisionFDA Truth Challenge for SNP accuracy), an early success of deep learning in the *classical* genomics pipeline.
 
 **Experiment.** Simulated sites (alternative allele frequency 0.15; Poisson depth; per-base error 0.01) called with the model above, which assumes independent errors at the nominal rate. Rows vary the *truth*: independent errors; 20% reference bias (alt-carrying reads are 20% less likely to be mapped); and site-specific error rates (log-normal, log-SD 1.0, as when particular sequence contexts or paralogous mismapping produce *correlated* errors).
@@ -138,9 +148,11 @@ Four lessons. **(i) Sensitivity saturates with depth** (0.63 at 2×, 0.96 at 10�
 ## 27.7 Quantification as a mixture model: EM on equivalence classes
 
 Gene and transcript expression is estimated by *counting reads assigned to transcripts*, but a read may be compatible with several isoforms. Model it as a mixture. Let transcript $t$ have effective length $\ell_t$ and relative abundance $\theta_t$ ($\sum_t\theta_t=1$); a read $r$ is generated by picking a transcript with probability proportional to $\theta_t\ell_t$ (longer transcripts yield more fragments), then a position uniformly, so $P(r\mid t)=\mathbb 1[r\sim t]/\ell_t$. The likelihood is
+
 $$
 L(\theta)=\prod_r\sum_t\alpha_t\,\frac{\mathbb 1[r\sim t]}{\ell_t},\qquad\alpha_t=\frac{\theta_t\ell_t}{\sum_u\theta_u\ell_u}.
 $$
+
 EM (Chapter 8) alternates the **E-step** $z_{rt}=\alpha_t\mathbb 1[r\sim t]/\sum_u\alpha_u\mathbb 1[r\sim u]$ (fractional assignment of each read among compatible transcripts) and the **M-step** $\alpha_t\leftarrow\frac1R\sum_rz_{rt}$, then $\theta_t\propto\alpha_t/\ell_t$. Reads with the same compatibility set (an **equivalence class**) are processed together, so the algorithm runs on counts per class: this is the core of the pseudo-alignment methods kallisto and Salmon (Bray et al., 2016; Patro et al., 2017) [[E]]. Two lessons: *expression levels from RNA-seq are model-based estimates*, with higher uncertainty for isoforms that share most of their sequence; and the same mixture-plus-EM formulation reappears in spatial deconvolution (Chapter 25) and in many probabilistic single-cell models (Chapter 30).
 
 ---

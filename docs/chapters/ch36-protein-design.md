@@ -45,22 +45,28 @@ report         successes (denominator!), novelty, diversity, structures
 ## 36.2 The mathematics of optimizing against a surrogate
 
 **KL-regularized optimization.** Let $p_0(x)$ be a reference distribution of plausible sequences (a language model, a family model, or the empirical distribution of homologs), $\hat f$ a surrogate of the objective, and $\beta>0$ a temperature. Choose the design distribution
+
 $$
 p^\star=\arg\max_{p}\ \Big\{\mathbb E_{x\sim p}[\hat f(x)]-\beta\,\mathrm{KL}(p\,\|\,p_0)\Big\}.
 $$
+
 !!! math "Derivation: the optimum"
     Add a Lagrange multiplier $\lambda$ for $\sum_x p(x)=1$. Then $\partial/\partial p(x)$ of $\sum_xp\hat f-\beta\sum_xp\log\frac{p}{p_0}-\lambda(\sum_xp-1)$ gives $\hat f(x)-\beta\log\frac{p(x)}{p_0(x)}-\beta-\lambda=0$, hence
+
     $$
     p^\star(x)=\frac{p_0(x)\,e^{\hat f(x)/\beta}}{Z},\qquad Z=\sum_xp_0(x)e^{\hat f(x)/\beta}.
     $$
+
     As $\beta\to\infty$, $p^\star\to p_0$ (no optimization); as $\beta\to0$, $p^\star$ concentrates on $\arg\max\hat f$ among sequences with $p_0>0$. The value at the optimum is the free energy $\beta\log Z$. $\square$
 
 This is the optimum of RLHF-style tuning (Chapter 17) and of the "design then filter" pipeline in the limit where filtering is rejection sampling with acceptance $\propto e^{\hat f/\beta}$. It is also the *Boltzmann distribution* of statistical physics with energy $-\hat f$ and temperature $\beta$ (Chapter 22). $\beta$ is a *trust region*: the KL divergence from $p_0$ that the designer is willing to spend.
 
 **The optimizer's curse.** Suppose the surrogate has errors, $\hat f=f+\varepsilon$ with $\varepsilon\sim\mathcal N(0,\sigma_\varepsilon^2)$ independent of $f\sim\mathcal N(\mu,\sigma_f^2)$ across candidates. Selecting the top candidate of $N$ by $\hat f$, the expected gain in $\hat f$ is $\sigma_{\hat f}\,\mathbb E[Z_{(N)}]$ with $\sigma_{\hat f}^2=\sigma_f^2+\sigma_\varepsilon^2$, of which the share that is *real* (in $f$) is
+
 $$
 \frac{\Delta f}{\Delta \hat f}=\frac{\sigma_f^2}{\sigma_f^2+\sigma_\varepsilon^2}=R^2_{\hat f\leftrightarrow f}\quad(\text{the squared correlation}),
 $$
+
 and the remainder $1-R^2$ of the promised gain is selection on error. (This is the same arithmetic as the winner's curse of Chapter 43 and the judge drift of Chapter 54.) The consequences: (i) *predicted improvement overstates true improvement by $1/R^2$* in this model; (ii) the overstatement grows with selection intensity ($\beta\downarrow$, $N\uparrow$); (iii) errors are not independent of $x$ in practice: they grow with the *distance from the training data*, so the optimizer is drawn to where they are largest.
 
 !!! rhyme "Structural rhyme: design against a surrogate ↔ reward overoptimization in RLHF ↔ judge drift (Chapter 54)"

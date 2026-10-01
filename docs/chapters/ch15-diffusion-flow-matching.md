@@ -18,13 +18,17 @@ Take data $x_0$. Gradually add Gaussian noise until nothing but noise remains. T
 ### 15.2.1 Forward process
 
 Fix a variance schedule $\beta_1,\dots,\beta_T\in(0,1)$ and define
+
 $$
 q(x_t\mid x_{t-1})=\Normal\big(x_t;\sqrt{1-\beta_t}\,x_{t-1},\ \beta_t\mathbf{I}\big).
 $$
+
 Let $\alpha_t=1-\beta_t$ and $\bar\alpha_t=\prod_{s=1}^t\alpha_s$. Because a Gaussian passed through a linear-Gaussian step is Gaussian, the marginal at any step has a closed form:
+
 $$
 q(x_t\mid x_0)=\Normal\big(x_t;\sqrt{\bar\alpha_t}\,x_0,\ (1-\bar\alpha_t)\mathbf{I}\big)\quad\Longleftrightarrow\quad x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\boldsymbol\epsilon,\ \ \boldsymbol\epsilon\sim\Normal(0,\mathbf{I}).
 $$
+
 *Proof by induction.* If $x_{t-1}=\sqrt{\bar\alpha_{t-1}}x_0+\sqrt{1-\bar\alpha_{t-1}}\boldsymbol\epsilon_1$, then $x_t=\sqrt{\alpha_t}x_{t-1}+\sqrt{\beta_t}\boldsymbol\epsilon_2=\sqrt{\bar\alpha_t}x_0+\sqrt{\alpha_t(1-\bar\alpha_{t-1})}\boldsymbol\epsilon_1+\sqrt{\beta_t}\boldsymbol\epsilon_2$; the two independent Gaussians sum to one with variance $\alpha_t(1-\bar\alpha_{t-1})+\beta_t=1-\bar\alpha_t$. $\square$ The code verifies this by simulating 40 forward steps one at a time from $x_0=(1.3,-0.7)$: simulated mean $(1.177,-0.634)$ and variance $0.181$, against closed form $(1.176,-0.633)$ and $0.181$. This closed form is what makes training cheap: *any* noise level can be sampled in one step, with no simulation.
 
 For large $T$ with a suitable schedule, $\bar\alpha_T\approx0$ and $q(x_T)\approx\Normal(0,\mathbf{I})$: the forward process destroys all information.
@@ -35,21 +39,27 @@ The reverse step *given the clean data* is also Gaussian. By Bayes, $q(x_{t-1}\m
 
 - precision: $\dfrac{\alpha_t}{\beta_t}+\dfrac{1}{1-\bar\alpha_{t-1}}=\dfrac{\alpha_t(1-\bar\alpha_{t-1})+\beta_t}{\beta_t(1-\bar\alpha_{t-1})}=\dfrac{1-\bar\alpha_t}{\beta_t(1-\bar\alpha_{t-1})}$, using $\alpha_t-\alpha_t\bar\alpha_{t-1}+\beta_t=1-\bar\alpha_t$;
 - hence variance $\tilde\beta_t=\dfrac{1-\bar\alpha_{t-1}}{1-\bar\alpha_t}\beta_t$ and mean
+
 $$
 \tilde{\boldsymbol\mu}_t(x_t,x_0)=\frac{\sqrt{\bar\alpha_{t-1}}\,\beta_t}{1-\bar\alpha_t}\,x_0+\frac{\sqrt{\alpha_t}\,(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}\,x_t .
 $$
+
 The code checks the mean against brute-force Bayes on a fine 1-D grid: formula $1.69270$, numerical $1.69270$.
 
 ### 15.2.3 The ELBO and the noise-prediction loss
 
 Treat $x_1,\dots,x_T$ as latent variables of a hierarchical VAE whose *encoder is the fixed forward process* and whose decoder is $p_\theta(x_{t-1}\mid x_t)=\Normal(\boldsymbol\mu_\theta(x_t,t),\sigma_t^2\mathbf{I})$ with $p(x_T)=\Normal(0,\mathbf{I})$. The ELBO (Chapter 8) decomposes into
+
 $$
 -\log p_\theta(x_0)\le\E_q\Big[\underbrace{\KL{q(x_T\mid x_0)}{p(x_T)}}_{L_T\ (\text{constant})}+\sum_{t=2}^T\underbrace{\KL{q(x_{t-1}\mid x_t,x_0)}{p_\theta(x_{t-1}\mid x_t)}}_{L_{t-1}}\ \underbrace{-\log p_\theta(x_0\mid x_1)}_{L_0}\Big].
 $$
+
 Each $L_{t-1}$ is a KL between two Gaussians with the same variance (taking $\sigma_t^2=\tilde\beta_t$), hence $L_{t-1}=\frac{1}{2\sigma_t^2}\|\tilde{\boldsymbol\mu}_t-\boldsymbol\mu_\theta\|^2$. Substituting $x_0=(x_t-\sqrt{1-\bar\alpha_t}\boldsymbol\epsilon)/\sqrt{\bar\alpha_t}$ into $\tilde{\boldsymbol\mu}_t$ gives
+
 $$
 \tilde{\boldsymbol\mu}_t=\frac{1}{\sqrt{\alpha_t}}\Big(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\,\boldsymbol\epsilon\Big),
 $$
+
 so we parameterize the learned mean the same way with a network $\boldsymbol\epsilon_\theta(x_t,t)$ predicting the noise. Then $L_{t-1}=\frac{\beta_t^2}{2\sigma_t^2\alpha_t(1-\bar\alpha_t)}\|\boldsymbol\epsilon-\boldsymbol\epsilon_\theta(x_t,t)\|^2$. Ho et al. (2020) found that dropping the weighting gives better samples, leading to the **simplified loss**
 
 $$
@@ -65,19 +75,25 @@ $$
 The **score** of a distribution is $\nabla_x\log p(x)$, the direction of steepest increase of the log-density (for an energy-based model, $-\nabla E$; Chapter 14). Score matching learns the score without the normalizer.
 
 **Noise prediction is score estimation.** For the forward marginal, $\nabla_{x_t}\log q(x_t\mid x_0)=-\frac{x_t-\sqrt{\bar\alpha_t}x_0}{1-\bar\alpha_t}=-\frac{\boldsymbol\epsilon}{\sqrt{1-\bar\alpha_t}}$. The score of the *noisy marginal* $q(x_t)=\int q(x_t\mid x_0)q(x_0)dx_0$ is
+
 $$
 \nabla\log q(x_t)=\frac{\int\nabla q(x_t\mid x_0)\,q(x_0)\,dx_0}{q(x_t)}=\E\big[\nabla_{x_t}\log q(x_t\mid x_0)\ \big|\ x_t\big]=-\frac{\E[\boldsymbol\epsilon\mid x_t]}{\sqrt{1-\bar\alpha_t}} .
 $$
+
 The minimizer of the squared-error noise-prediction loss is the *conditional mean* $\boldsymbol\epsilon^\star(x_t,t)=\E[\boldsymbol\epsilon\mid x_t]$ (Chapter 7: the Bayes predictor under squared loss). Therefore
+
 $$
 \boxed{\nabla_{x_t}\log q(x_t)=-\frac{\boldsymbol\epsilon^\star(x_t,t)}{\sqrt{1-\bar\alpha_t}}.}
 $$
+
 **Training a denoiser *is* learning the score of the noised data distribution at every noise level** (Vincent, 2011; Song & Ermon, 2019).
 
 **Tweedie's formula.** Rearranging, the *posterior mean of the clean data* given the noisy observation is
+
 $$
 \E[x_0\mid x_t]=\frac{1}{\sqrt{\bar\alpha_t}}\Big(x_t+(1-\bar\alpha_t)\nabla\log q(x_t)\Big).
 $$
+
 (For Gaussian noise of variance $\sigma^2$ added to $x_0$: $\E[x_0\mid x_t]=x_t+\sigma^2\nabla\log p_\sigma(x_t)$.) *Check on a closed-form case*: $x_0\sim\Normal(0,s_0^2)$, $x_t=x_0+\sigma\epsilon$. The noisy marginal is $\Normal(0,s_0^2+\sigma^2)$ with score $-x_t/(s_0^2+\sigma^2)$, so $x_t+\sigma^2\cdot\text{score}=x_t\,s_0^2/(s_0^2+\sigma^2)$, which is the familiar Gaussian posterior mean. The code confirms both sides equal $1.79066$ for $s_0=1.5$, $\sigma=0.8$, $x_t=2.3$.
 
 **Interpretation for biology.** The denoiser at noise level $\sigma$ is the *optimal estimator of the clean object from a corrupted version*, in the Bayes sense: it embeds *everything the data distribution knows* about how structures, sequences, or cells fit together at that scale. At high noise it must reconstruct global arrangement (fold topology; cell-type identity); at low noise it refines local geometry (bond lengths; fine expression structure). This **coarse-to-fine** decomposition by noise level is a natural fit for hierarchical structures such as proteins and is one reason diffusion works for structure.
@@ -89,19 +105,25 @@ $$
 Let the forward process be an SDE $dx=f(x,t)\,dt+g(t)\,d\mathbf{w}$ (Song et al., 2021). The DDPM forward process is the discretization of the **variance-preserving SDE** $dx=-\frac12\beta(t)x\,dt+\sqrt{\beta(t)}\,d\mathbf{w}$. Two classical results:
 
 1. **Reverse-time SDE** (Anderson, 1982): the same marginals $p_t$ are traced backward in time by
+
 $$
 dx=\big[f(x,t)-g(t)^2\nabla_x\log p_t(x)\big]\,dt+g(t)\,d\bar{\mathbf{w}}.
 $$
+
 The *only* unknown is the score $\nabla_x\log p_t$, which the denoiser supplies (§15.3).
 
 2. **Probability-flow ODE.** The marginal densities of the SDE obey the Fokker–Planck equation
+
 $$
 \partial_tp_t=-\nabla\!\cdot\!(fp_t)+\tfrac12g^2\Delta p_t .
 $$
+
 Since $\Delta p=\nabla\cdot(p\nabla\log p)$, this equals $\partial_tp_t=-\nabla\cdot\big[(f-\tfrac12g^2\nabla\log p_t)p_t\big]$, a *continuity equation* of the deterministic flow
+
 $$
 \frac{dx}{dt}=f(x,t)-\tfrac12g(t)^2\nabla_x\log p_t(x).
 $$
+
 So a **deterministic ODE** with the same marginals exists. DDIM (Song et al., 2021) is an Euler-type discretization of this ODE, allowing 10–50 steps instead of 1,000 and giving a *deterministic map* between noise and samples (hence an encoder, and exact likelihoods via the change-of-variables formula of Chapter 14, §14.4).
 
 **Practical consequences.** Sampling is *ODE/SDE integration*: use better solvers (Heun, DPM-solver) for fewer steps; the stochastic sampler adds noise that corrects errors; the ODE sampler is deterministic and smooth. A trained model can be used for *likelihood evaluation* (exact via the ODE and the Hutchinson trace estimator, or via the ELBO).
@@ -121,9 +143,11 @@ $$
 $$
 
 **Why regressing onto a conditional target learns the marginal velocity.** The *marginal* path $p_t(x)=\E_{x_0,x_1}[\delta(x-x_t)]$ is generated by the marginal velocity field
+
 $$
 u_t(x)=\E\big[x_1-x_0\ \big|\ x_t=x\big].
 $$
+
 (*Sketch*: each conditional path satisfies a continuity equation with its conditional velocity; the continuity equation is linear in the density, so the mixture satisfies it with the posterior-averaged velocity.) The squared-error minimizer over $v_\theta$ is the conditional mean of the target given $(x_t,t)$, which is exactly $u_t(x)$ (Chapter 7: Bayes predictor). So **regressing on the easy conditional velocity trains the network to equal the hard marginal velocity**, with no ODE simulation during training. [[E]]
 
 **Sampling:** integrate $\dot x=v_\theta(x,t)$ from $t=0$ ($x\sim\Normal(0,\mathbf{I})$) to $t=1$ with an ODE solver. In the code, 50 Euler steps from noise.
@@ -151,9 +175,11 @@ To sample $x\sim p(x\mid y)$ for a condition $y$ (a pocket, a property value, a 
 
 - **Classifier guidance** (Dhariwal & Nichol, 2021) adds the gradient of a separately trained noise-aware classifier, scaled: $\nabla\log p(x)+(1+w)\nabla\log p(y\mid x)$, which targets the *sharpened* density $p(x)\,p(y\mid x)^{1+w}$.
 - **Classifier-free guidance (CFG)** (Ho & Salimans, 2022) trains a single network on $y$ with random label dropout (15% in the code), so that it learns both $\epsilon_\theta(x_t,y)$ and the unconditional $\epsilon_\theta(x_t,\varnothing)$. Since $\nabla\log p(y\mid x)=\nabla\log p(x\mid y)-\nabla\log p(x)$, the guided noise estimate is
+
 $$
 \tilde{\boldsymbol\epsilon}=(1+w)\,\boldsymbol\epsilon_\theta(x_t,y)-w\,\boldsymbol\epsilon_\theta(x_t,\varnothing),
 $$
+
 which targets $p(x\mid y)^{1+w}\,p(x)^{-w}$: *the conditional distribution sharpened relative to the unconditional.* Larger $w$ increases conditional fidelity at the cost of diversity.
 
 **Biological uses.** Conditioning on a **target pocket or binding partner** (RFdiffusion binder design), on a **partial structure** (motif scaffolding), on a **property** (expression level, solubility, binding affinity), on **perturbation identity and cell context** (virtual-cell generators; Chapter 39).
@@ -195,9 +221,11 @@ classifier-free guidance, DDPM, target mode 0 = (+2,+2):
 ## 15.7 Diffusion for discrete data: sequences and masked diffusion
 
 Gaussian noise does not apply to categorical tokens. **Discrete diffusion** replaces it with a corruption process on tokens: at each step, each token is resampled according to a transition matrix $\mathbf{Q}_t$ (D3PM; Austin et al., 2021). The most successful choice for text and biological sequences is the **absorbing-state (masking) process**: each token independently survives with probability $\alpha_t$ and otherwise becomes a special $[\mathrm{MASK}]$ token, with $\alpha_0=1$ and $\alpha_1=0$. The reverse model predicts the clean token at each masked position given the unmasked ones. The ELBO simplifies to a time-weighted **masked-language-modeling** loss:
+
 $$
 \mathcal{L}=\int_0^1\frac{-\alpha_t'}{1-\alpha_t}\ \E_{x_0,\,x_t}\Big[\sum_{i:\,x_t^i=[\mathrm{M}]}-\log p_\theta\big(x_0^i\mid x_t\big)\Big]\,dt
 $$
+
 (Sahoo et al., 2024; Shi et al., 2024).
 
 **Relation to Chapter 13.** The BERT/ESM masked-LM loss with a *fixed* 15% mask rate is a single slice of this integral. Training with a *random* mask rate and the right weighting turns the masked LM into a **valid generative model whose ELBO bounds the likelihood**, sampled by starting from an all-masked sequence and iteratively unmasking. Thus **protein language models trained with variable-ratio masking are generative diffusion models** (e.g., EvoDiff, Alamdari et al., 2023; DPLM, Wang et al., 2024), and the sampling of a masked LM by iterative re-masking is a heuristic version of the reverse process. [[S]]

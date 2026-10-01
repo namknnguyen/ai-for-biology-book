@@ -50,6 +50,7 @@ Even at $\rho=1$ the gradient vanishes (the $\tanh$ derivative below 1 contribut
 ### 11.2.3 LSTMs and the additive memory path
 
 The **LSTM** (Hochreiter & Schmidhuber, 1997) adds a **cell state** $\mathbf{c}_t$ updated *additively*, controlled by gates:
+
 $$
 \begin{aligned}
 \mathbf{f}_t&=\sigma(\mathbf{W}_f\mathbf{x}_t+\mathbf{U}_f\mathbf{h}_{t-1}+\mathbf{b}_f),\ \ \mathbf{i}_t=\sigma(\cdots),\ \ \mathbf{o}_t=\sigma(\cdots),\\
@@ -58,6 +59,7 @@ $$
 \mathbf{h}_t=\mathbf{o}_t\odot\tanh(\mathbf{c}_t).
 \end{aligned}
 $$
+
 The direct path $\partial\mathbf{c}_t/\partial\mathbf{c}_{t-1}=\mathrm{diag}(\mathbf{f}_t)$ has *no weight matrix and no saturating nonlinearity*: if the forget gate is near 1, the error signal flows backward unchanged (the *constant error carousel*). The model *learns when to remember* ($f\approx1$) and when to overwrite. The GRU is a simplified variant. LSTMs powered pre-transformer sequence modeling, including protein representations (UniRep, Alley et al., 2019; SeqVec/ELMo, Heinzinger et al., 2019) and early secondary-structure predictors.
 
 **Why RNNs lost to attention and SSMs for large-scale modeling.** (i) *Sequential training*: step $t$ cannot be computed before step $t-1$, leaving GPUs underused. (ii) *State bottleneck*: all history must pass through a fixed-size vector. (iii) *Optimization difficulty at long lags* despite gating. Nevertheless, the RNN's $O(1)$ per-token memory at inference remains attractive for megabase sequences, a property that SSMs recover with parallel training.
@@ -69,15 +71,19 @@ The direct path $\partial\mathbf{c}_t/\partial\mathbf{c}_{t-1}=\mathrm{diag}(\ma
 ### 11.3.1 From continuous dynamics to a discrete recurrence
 
 A **linear state-space model** describes a continuous input signal $x(t)$ via a latent state:
+
 $$
 \dot{\mathbf{h}}(t)=\mathbf{A}\,\mathbf{h}(t)+\mathbf{B}\,x(t),\qquad y(t)=\mathbf{C}\,\mathbf{h}(t)\ (+\,D\,x(t)).
 $$
+
 With state $\mathbf{h}\in\R^N$, $\mathbf{A}\in\R^{N\times N}$, $\mathbf{B},\mathbf{C}^\top\in\R^{N}$. The solution is $\mathbf{h}(t)=e^{\mathbf{A}t}\mathbf{h}(0)+\int_0^te^{\mathbf{A}(t-s)}\mathbf{B}x(s)\,ds$.
 
 **Discretization (zero-order hold).** Sample at step $\Delta$ and hold $x$ constant over each interval. Then $\mathbf{h}_{k+1}=\bar{\mathbf{A}}\mathbf{h}_k+\bar{\mathbf{B}}x_k$ with
+
 $$
 \bar{\mathbf{A}}=e^{\Delta\mathbf{A}},\qquad\bar{\mathbf{B}}=(\Delta\mathbf{A})^{-1}\big(e^{\Delta\mathbf{A}}-\mathbf{I}\big)\Delta\mathbf{B}=\mathbf{A}^{-1}\big(e^{\Delta\mathbf{A}}-\mathbf{I}\big)\mathbf{B}.
 $$
+
 *Derivation.* Over $[k\Delta,(k+1)\Delta)$ with $x\equiv x_k$: $\mathbf{h}_{k+1}=e^{\mathbf{A}\Delta}\mathbf{h}_k+\int_0^\Delta e^{\mathbf{A}(\Delta-s)}\mathbf{B}\,ds\,x_k$, and $\int_0^\Delta e^{\mathbf{A}(\Delta-s)}ds=\mathbf{A}^{-1}(e^{\mathbf{A}\Delta}-\mathbf{I})$. $\square$ The parameter $\Delta$ (a learned timescale) controls how much of the past is retained: small $\Delta$ means long memory.
 
 ### 11.3.2 Two equivalent computations
@@ -106,15 +112,19 @@ A random $\mathbf{A}$ forgets quickly. **HiPPO** (Gu et al., 2020) derives a spe
 ## 11.4 Selective state spaces (Mamba) and the associative scan
 
 **Mamba** (Gu & Dao, 2023) makes the discretization step and the projections *functions of the input*: $\Delta_t,\mathbf{B}_t,\mathbf{C}_t=f(x_t)$. The recurrence is then
+
 $$
 \mathbf{h}_t=\bar{\mathbf{A}}_t\mathbf{h}_{t-1}+\bar{\mathbf{B}}_tx_t,\qquad y_t=\mathbf{C}_t\mathbf{h}_t,
 $$
+
 with $\bar{\mathbf{A}}_t=\exp(\Delta_t\mathbf{A})$ varying with the content of $x_t$. A large $\Delta_t$ resets the state toward the current input (forget the past, focus on this token); a small $\Delta_t$ retains the past and ignores the current input. This *selection* restores content-based memory. The price is that the system is *time-varying*: there is no single kernel $\bar K$, so the FFT convolution trick no longer applies.
 
 **Parallel scan.** The recurrence $h_t=a_th_{t-1}+b_t$ (scalar for clarity) is a composition of *affine maps* $h\mapsto a_th+b_t$. Composition of affine maps is **associative**:
+
 $$
 (a_2,b_2)\circ(a_1,b_1)=(a_2a_1,\ a_2b_1+b_2),
 $$
+
 and associativity allows computing all prefixes in $O(\log L)$ parallel rounds with $O(L)$ total work (a *parallel prefix scan*; Blelloch, 1990). The code implements a Hillis–Steele scan, using 10 rounds for $L=1000$, and agrees with the sequential recurrence to $1.3\times10^{-15}$. Mamba additionally fuses the scan into a single GPU kernel that keeps the expanded state in fast on-chip memory (hardware-aware implementation), which is what makes it fast in practice.
 
 **Relation to attention.** Dao & Gu (2024, "Mamba-2") showed that SSMs of a restricted form are equivalent to a masked *linear attention* with a semiseparable mask ("state-space duality"), tying together the two families. [[S]] This anticipates Chapter 12: an SSM is an attention-like mixing with a *structured* (low-rank-in-time) mixing matrix.

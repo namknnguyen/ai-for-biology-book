@@ -22,22 +22,28 @@
 ## 42.1 The statistical machinery
 
 **Substitution as a continuous-time Markov chain.** A site with $A$ states (4 nucleotides, 20 amino acids, 61 codons) changes state at rates given by a matrix $Q$ (off-diagonal $q_{ab}\ge0$, rows sum to zero). Transition probabilities over a branch of length $t$ (expected substitutions per site, or time times rate) are
+
 $$
 P(t)=e^{Qt},\qquad P_{ab}(t)=\Pr(\text{state }b\text{ at the end}\mid\text{state }a\text{ at the start}).
 $$
+
 A model is *time-reversible* if $\pi_aq_{ab}=\pi_bq_{ba}$ for the stationary distribution $\pi$, which allows the tree to be rooted anywhere for likelihood purposes. Examples: Jukes–Cantor ($q_{ab}=\mu$ for all $a\neq b$; equal frequencies); **F81** ($q_{ab}=\mu\pi_b$), for which
+
 $$
 P(t)=e^{-\mu t}I+(1-e^{-\mu t})\,\mathbf 1\pi^\top,
 $$
+
 a convex mixture of "no change" and "redraw from $\pi$" (the model of this chapter's simulations); HKY and GTR (nucleotide models with transition/transversion and exchangeability parameters); empirical amino-acid matrices (JTT, WAG, LG); codon models (Goldman–Yang; MG94) with a $\omega=d_N/d_S$ parameter, where $\omega<1$ indicates purifying selection, $\omega\approx1$ neutrality, $\omega>1$ positive selection.
 
 **Rate heterogeneity.** Sites evolve at different rates; modeling the rate multiplier as Gamma-distributed with shape $\alpha$ (small $\alpha$ means strong heterogeneity) is standard. **Site-specific profiles** (the CAT model, profile mixtures) let each site have its own stationary distribution $\pi_i$, which matters because proteins have conserved positions that accept only a few residues; the simulations below use this structure.
 
 !!! math "Derivation: the pruning algorithm"
     For a rooted tree with $N$ leaves and one site, define for each node $v$ and state $a$ the *partial likelihood* $L_v(a)=\Pr(\text{data below }v\mid\text{state at }v=a)$. At a leaf with observed state $x$, $L_v(a)=\mathbf 1[a=x]$. At an internal node with children $c_1,c_2$ and branch lengths $t_1,t_2$,
+
     $$
     L_v(a)=\prod_{k=1,2}\Big(\sum_{b}P_{ab}(t_k)\,L_{c_k}(b)\Big).
     $$
+
     At the root, the site likelihood is $\sum_a\pi_aL_{\text{root}}(a)$, and the likelihood of an alignment is the product over sites (or the sum of logs). Each node costs $O(A^2)$ per site, so the whole tree costs $O(NLA^2)$, linear in the number of leaves, instead of the $A^{N-1}$ sum over all internal assignments. The same recursion gives the **marginal posterior of the root state**, $\Pr(\text{root}=a\mid\text{data})\propto\pi_aL_{\text{root}}(a)$, and with a second (downward) pass the posterior at any internal node: the basis of ancestral reconstruction. $\square$
 
 **Tree inference.** Searching tree space is NP-hard; heuristics (maximum parsimony; maximum likelihood with subtree-pruning-and-regrafting search in RAxML and IQ-TREE; Bayesian MCMC in MrBayes and BEAST) are standard. Deep-learning approaches (quartet classifiers, Zou et al., *Mol. Biol. Evol.* 2020; generative flow networks over trees) are active research but have not displaced likelihood methods on real data [[S]]. **Long-branch attraction** (inconsistency of parsimony when two long branches are unrelated) and **model misspecification** are the standard failure modes.
@@ -112,9 +118,11 @@ root-to-tip   method                                   accuracy   typicality s  
 ## 42.3 Shared ancestry: effective sample size and false correlations
 
 Related species are not independent draws. If a trait evolves by Brownian motion on a tree, the covariance between two species is the length of the path they share from the root, $C_{ij}$, and the variance of the sample mean of $N$ species is $\mathbf 1^\top C\mathbf 1/N^2$, so the **effective number of independent observations** relative to independent draws with the same variance $C_{ii}=T$ is
+
 $$
 N_\text{eff}=\frac{N^2\,T}{\mathbf 1^\top C\,\mathbf 1}.
 $$
+
 For a star tree ($C=TI$) this is $N$; for a deep split into two clades it approaches 2. **Felsenstein (1985)** showed that comparative analyses that treat species as independent have inflated false-positive rates; the remedies are phylogenetic independent contrasts or **phylogenetic generalized least squares** (PGLS), which fits $y=X\beta+\varepsilon$, $\varepsilon\sim\mathcal N(0,\sigma^2C)$ by generalized least squares (the same likelihood as a linear mixed model with a kinship matrix, Chapter 26, where the "relatedness" is the shared path length).
 
 The second part of the script uses 32 species on 3,000 random coalescent trees, tests the correlation between two traits that evolved *independently*, and computes $N_\text{eff}$ for the mean.

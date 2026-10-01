@@ -71,9 +71,11 @@
 RNA folds by base pairing: Watson–Crick (A–U, G–C) and wobble (G–U) pairs forming stems, with loops between them. Under the **nearest-neighbor thermodynamic model** (Turner rules), the free energy of a secondary structure is the sum of contributions of its loops (hairpin, bulge, internal, multibranch) and the **stacking** of adjacent pairs, with parameters measured on small oligonucleotides (Turner & Mathews, 2010). The **minimum free energy (MFE)** structure is found by dynamic programming.
 
 **The recursion (Nussinov, Zuker).** Let $W(i,j)$ be the optimal energy of the subsequence $i..j$ and $V(i,j)$ the optimal energy given that $i$ and $j$ pair. For the simplest (Nussinov) model, which maximizes the number of base pairs,
+
 $$
 W(i,j)=\max\Big\{W(i{+}1,j),\ W(i,j{-}1),\ W(i{+}1,j{-}1)+\delta(i,j),\ \max_{i<k<j}\big[W(i,k)+W(k{+}1,j)\big]\Big\},
 $$
+
 with $\delta(i,j)=1$ if bases $i$ and $j$ can pair. Zuker's algorithm replaces the pair count by loop energies (hairpin, stack, bulge, interior, multi-loop terms), and runs in $O(N^3)$ time and $O(N^2)$ memory for length $N$ (excluding pseudoknots, which make the problem NP-hard in general). **McCaskill's** partition function algorithm computes $Z=\sum_Se^{-E(S)/RT}$ and the **base-pair probabilities** $P(i,j)$ in $O(N^3)$, and thus an *ensemble* instead of a single structure (the Boltzmann weights of Chapter 22 once more).
 
 **An experiment on real tRNAs** (`code/ch33_rna_structure.py`; ViennaRNA implementation of the Zuker algorithm). The chloroplast genome of *Arabidopsis* (Chapter 28) has 28 single-exon tRNA genes of 60–95 nt (mean 75 nt, mean GC 0.52). All tRNAs share a universal **cloverleaf**: a 7-bp acceptor stem enclosing three hairpins (D-arm, anticodon arm, T-arm).

@@ -123,9 +123,11 @@ For $f(z)=z^2$ and $q=\Normal(\mu,1)$ the true gradient with respect to $\mu$ is
 ### 8.4.2 KL between Gaussians (the closed form used everywhere)
 
 For $q=\Normal(m,s^2)$ and $p=\Normal(0,1)$:
+
 $$
 \KL{q}{p}=\E_q\Big[\log\frac{q(z)}{p(z)}\Big]=\E_q\Big[-\log s-\tfrac{(z-m)^2}{2s^2}+\tfrac{z^2}{2}\Big]=-\log s-\tfrac12+\tfrac12(m^2+s^2)=\tfrac12\big(m^2+s^2-1-\log s^2\big).
 $$
+
 (using $\E_q[(z-m)^2]=s^2$ and $\E_q[z^2]=m^2+s^2$). In $d$ dimensions with diagonal covariance, sum over coordinates. The Monte Carlo check in the code agrees to three decimals (0.4358 vs. 0.4365).
 
 ---

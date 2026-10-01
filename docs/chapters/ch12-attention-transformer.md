@@ -51,9 +51,11 @@ If the entries of $\mathbf{q}$ and $\mathbf{k}$ are independent with zero mean a
 ### 12.2.4 Attention as kernel regression
 
 The attention output for a query is
+
 $$
 \sum_j\frac{\kappa(\mathbf{q},\mathbf{k}_j)}{\sum_{j'}\kappa(\mathbf{q},\mathbf{k}_{j'})}\mathbf{v}_j,\qquad\kappa(\mathbf{q},\mathbf{k})=e^{\mathbf{q}^\top\mathbf{k}/\sqrt{d_k}},
 $$
+
 which is the **Nadaraya–Watson kernel regression** estimator with an exponential-dot-product kernel: *a locally weighted average of values*. This classical interpretation (Chapter 7's kernel methods) explains attention's strengths and weaknesses: it is a *non-parametric memory lookup*, great at retrieval, with no built-in notion of order or arithmetic.
 
 ---
@@ -66,6 +68,7 @@ $$
 \mathrm{head}_h=\mathrm{Attn}(\mathbf{X}\mathbf{W}_Q^{(h)},\mathbf{X}\mathbf{W}_K^{(h)},\mathbf{X}\mathbf{W}_V^{(h)}),\qquad
 \mathrm{MHA}(\mathbf{X})=[\mathrm{head}_1;\dots;\mathrm{head}_H]\,\mathbf{W}_O ,
 $$
+
 with $\mathbf{W}_Q^{(h)},\mathbf{W}_K^{(h)},\mathbf{W}_V^{(h)}\in\R^{d\times d_h}$, $d_h=d/H$, $\mathbf{W}_O\in\R^{d\times d}$. In practice all heads are computed by *one* linear projection to width $d$ followed by a reshape:
 
 | Step | Operation | Shape |
@@ -101,9 +104,11 @@ Permute the input rows by $\mathbf{P}$. Then $\mathbf{Q}\to\mathbf{P}\mathbf{Q}$
 - **Rotary position embedding (RoPE)** (Su et al., 2021): rotate query and key vectors by a position-dependent angle.
 
 **Derivation of RoPE.** Take a 2-D slice of a query/key and let $\mathbf{R}(\phi)$ be the rotation by angle $\phi$. Define $\tilde{\mathbf{q}}_m=\mathbf{R}(m\theta)\mathbf{q}_m$ and $\tilde{\mathbf{k}}_n=\mathbf{R}(n\theta)\mathbf{k}_n$. Since rotations are orthogonal and compose by adding angles ($\mathbf{R}(a)^\top\mathbf{R}(b)=\mathbf{R}(b-a)$),
+
 $$
 \tilde{\mathbf{q}}_m^\top\tilde{\mathbf{k}}_n=\mathbf{q}_m^\top\mathbf{R}(m\theta)^\top\mathbf{R}(n\theta)\mathbf{k}_n=\mathbf{q}_m^\top\mathbf{R}\big((n-m)\theta\big)\mathbf{k}_n .
 $$
+
 The score depends on **absolute positions only through their difference $n-m$**: a purely relative encoding implemented without extra parameters. A $d_h$-dimensional head is split into $d_h/2$ planes with frequencies $\theta_i=10000^{-2i/d_h}$, covering many wavelengths. The code confirms $\mathbf{q}_m\cdot\mathbf{k}_{m+7}$ is identical for $m=0,5,100,1000$ (4.4367 each, up to float32 rounding). RoPE is standard in modern protein and DNA transformers; extending context beyond the training length is done by rescaling the angles (position interpolation, NTK/YaRN scaling).
 
 !!! lens "Research lens: positional encoding in biology"
@@ -114,18 +119,22 @@ The score depends on **absolute positions only through their difference $n-m$**:
 ## 12.5 The Transformer block, parameters, and FLOPs
 
 A (pre-LN) **Transformer block** applies, with $\mathbf{x}\in\R^{L\times d}$:
+
 $$
 \mathbf{x}\leftarrow\mathbf{x}+\mathrm{MHA}(\mathrm{LN}(\mathbf{x})),\qquad
 \mathbf{x}\leftarrow\mathbf{x}+\mathrm{MLP}(\mathrm{LN}(\mathbf{x})),
 $$
+
 with $\mathrm{MLP}(\mathbf{x})=\mathbf{W}_2\,\mathrm{GELU}(\mathbf{W}_1\mathbf{x})$, $\mathbf{W}_1\in\R^{4d\times d}$, $\mathbf{W}_2\in\R^{d\times4d}$ (modern LLMs use a gated SwiGLU with a different multiplier). The two sub-layers are residual (Chapter 9). Stack $N_\text{layers}$ blocks between an embedding layer and an output head.
 
 **Parameters per layer:** attention $4d^2$ + MLP $8d^2$ = $\mathbf{12d^2}$ (plus $O(d)$ biases and norms). The code counts 789,760 for $d=256$ versus $12d^2=786{,}432$, and 12,596,224 for $d=1024$ versus 12,582,912. A model with $N_\text{layers}=32$ and $d=4096$ has $\approx12\times32\times4096^2\approx6.4\times10^9$ parameters (plus embeddings).
 
 **Forward FLOPs per token per layer:** the projections and MLP perform $2\times12d^2=24d^2$ FLOPs (2 FLOPs per parameter); the score and value mixing perform $2\times2\,Ld=4Ld$ ($\mathbf{Q}\mathbf{K}^\top$ and weights$\times\mathbf{V}$, each $2Ld$ per token). So
+
 $$
 \text{FLOPs per token per layer}\approx24d^2+4Ld .
 $$
+
 Attention's $L$-dependent term dominates when $L>6d$. At $d=1024$, that is $L>6{,}144$. At the context lengths of genomic models ($L\sim10^5$–$10^6$), the attention term dominates by orders of magnitude (the table in Chapter 11 §11.6).
 
 **KV cache.** During autoregressive generation one stores the keys and values of all previous tokens: $2\cdot N_\text{layers}\cdot L\cdot d$ numbers (times bytes per number). For $N_\text{layers}=32$, $d=4096$, $L=10^5$ in 16-bit: $2\times32\times10^5\times4096\times2\ \text{bytes}\approx52$ GB per sequence: the reason inference at long contexts is memory-bound and why MQA/GQA and fixed-state alternatives (Chapter 11) exist.
@@ -139,6 +148,7 @@ Attention's $L$-dependent term dominates when $L>6d$. At $d=1024$, that is $L>6{
 Standard attention writes the $B\times H\times L\times L$ score matrix to GPU memory (HBM), which is slow relative to arithmetic. **FlashAttention** (Dao et al., 2022) computes *exact* attention in tiles that fit in fast on-chip SRAM, never storing the full matrix, so memory is $O(L)$ and wall-clock time drops substantially even though FLOPs are unchanged.
 
 The key is the **online softmax**. For a query row with scores $s_1,\dots,s_L$ processed in blocks, maintain a running maximum $m$, a running normalizer $\ell=\sum_je^{s_j-m}$, and a running output $\mathbf{o}=\ell^{-1}\sum_je^{s_j-m}\mathbf{v}_j$. When a new block with scores $\mathbf{s}'$ and values $\mathbf{V}'$ arrives:
+
 $$
 \begin{aligned}
 m^\text{new}&=\max\big(m,\max\mathbf{s}'\big),\qquad
@@ -146,6 +156,7 @@ m^\text{new}&=\max\big(m,\max\mathbf{s}'\big),\qquad
 \mathbf{o}^\text{new}&=\frac{e^{m-m^\text{new}}\,\ell\,\mathbf{o}+\sum_je^{s'_j-m^\text{new}}\mathbf{v}'_j}{\ell^\text{new}} .
 \end{aligned}
 $$
+
 *Why it is exact.* The softmax is shift-invariant ($e^{s-c}/\sum e^{s-c}$ does not depend on $c$), so we may use any running maximum for numerical stability, and rescaling the old accumulators by $e^{m-m^\text{new}}$ re-expresses them relative to the new maximum. The code implements this with blocks of 16 keys and matches full attention to $2.4\times10^{-7}$. FlashAttention-2/3 add better parallelism and hardware-specific kernels. [[E]]
 
 **Take-away for genomics.** FlashAttention moves the practical wall from *memory* to *FLOPs*: $L=10^5$ becomes feasible but $L=10^6$ at $\sim10^{16}$ FLOPs/layer remains expensive (Chapter 11).
@@ -154,9 +165,11 @@ $$
 
 - **Sparse/local attention** (sliding windows plus a few global tokens: Longformer, BigBird): $O(Lw)$ with window $w$. Natural for genomics (local context matters most), but loses arbitrary long-range pairs.
 - **Linear attention** replaces $\exp(\mathbf{q}^\top\mathbf{k})$ by a *feature-map* kernel $\phi(\mathbf{q})^\top\phi(\mathbf{k})$. Then
+
 $$
 \sum_j\phi(\mathbf{q})^\top\phi(\mathbf{k}_j)\mathbf{v}_j=\phi(\mathbf{q})^\top\Big(\sum_j\phi(\mathbf{k}_j)\mathbf{v}_j^\top\Big)
 $$
+
 by associativity of matrix products: the bracketed $d_k\times d_v$ matrix is computed once, giving $O(Ld_kd_v)$, *linear in $L$*. The code verifies agreement with the quadratic computation to $1.6\times10^{-7}$ for $\phi=\mathrm{elu}+1$. In the causal case the bracket becomes a running sum, **an RNN with a matrix-valued state**: the bridge to SSMs (Chapter 11, Mamba-2's duality). The cost is that linear kernels cannot reproduce the sharp, selective softmax, and recall quality suffers.
 - **Low-rank/approximate** (Linformer, Performer): approximate the attention matrix by projections or random features.
 - **Hybrid** (Chapter 11): few attention layers among cheap operators.

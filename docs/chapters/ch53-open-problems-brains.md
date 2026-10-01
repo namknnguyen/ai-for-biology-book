@@ -44,21 +44,27 @@ The pairs **(anatomy without function)** and **(function without anatomy)** are 
 ## 53.2 The standard models, from first principles
 
 **Leaky integrate-and-fire (LIF).** A neuron's membrane potential $V$ integrates input current through a leak:
+
 $$
 \tau_m \frac{dV}{dt}=-(V-V_\text{rest})+R\,I(t),\qquad \text{if } V\ge V_\text{th}:\ \text{emit a spike and reset } V\leftarrow V_\text{reset}.
 $$
+
 With a constant current $I$ the neuron fires periodically at rate
+
 $$
 f(I)=\Big[\tau_m \ln\!\frac{RI+V_\text{rest}-V_\text{reset}}{RI+V_\text{rest}-V_\text{th}}\Big]^{-1}\quad\text{for } RI>V_\text{th}-V_\text{rest},
 $$
+
 a threshold-linear curve at moderate currents. The model has two parameters per neuron that matter for rates ($\tau_m$, the threshold distance) and no ion-channel detail; its virtue is that circuits of $10^5$ LIF neurons can be simulated (Shiu et al., §53.5).
 
 **Hodgkin–Huxley and beyond.** Voltage-gated conductances ($g_\text{Na},g_\text{K}$ with gating variables) explain the shape of the spike and the diversity of firing patterns; each additional channel adds parameters, and *many different combinations of conductances give the same behavior* (degeneracy, §53.4).
 
 **Rate networks.** Averaging over spikes gives a firing-rate model for $N$ neurons,
+
 $$
 \tau\,\dot r=-r+\phi(Wr+u(t)),
 $$
+
 with $W\in\mathbb R^{N\times N}$ the synaptic weight matrix (Dale's law: each column has one sign, excitatory or inhibitory), $u$ the external input, and $\phi$ a saturating or rectifying nonlinearity. The simulation of §53.5 uses $\phi=\tanh$.
 
 !!! math "Derivation: stability and the spectral radius"

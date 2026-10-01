@@ -109,9 +109,11 @@ typical set: per-symbol NLL of sampled sequences = 0.611 +/- 0.022 (entropy 0.61
 ### 14.4.1 Change of variables
 
 Let $Z\sim p_Z$ and $X=f(Z)$ with $f$ a differentiable invertible map. Then
+
 $$
 p_X(x)=p_Z\big(f^{-1}(x)\big)\,\Big|\det\frac{\partial f^{-1}}{\partial x}\Big|\;=\;p_Z(z)\,\Big|\det\frac{\partial f}{\partial z}\Big|^{-1},\qquad z=f^{-1}(x).
 $$
+
 *Intuition:* probability mass is conserved, so a region that $f$ stretches has its density diluted by the stretch factor $|\det\mathbf{J}|$. 1-D check: $Z\sim\Normal(0,1)$, $X=e^Z$; $p_X(x)=\varphi(\ln x)\cdot\frac1x$, which at $x=1.7$ equals 0.20385 and matches the lognormal density from SciPy.
 
 A **normalizing flow** composes many simple invertible maps $f=f_K\circ\dots\circ f_1$; log-densities add, $\log p_X(x)=\log p_Z(z_0)-\sum_k\log|\det\mathbf{J}_{f_k}|$. Training maximizes the *exact* likelihood. The architectural challenge is making $f$ invertible with a cheap Jacobian determinant.
@@ -119,9 +121,11 @@ A **normalizing flow** composes many simple invertible maps $f=f_K\circ\dots\cir
 ### 14.4.2 Coupling layers
 
 An **affine coupling layer** (RealNVP; Dinh et al., 2017) splits $x=(x_1,x_2)$ and sets
+
 $$
 y_1=x_1,\qquad y_2=x_2\odot\exp\big(s(x_1)\big)+t(x_1).
 $$
+
 $s$ and $t$ are arbitrary neural networks of $x_1$, **never inverted**. The inverse is trivial, $x_2=(y_2-t(y_1))\odot\exp(-s(y_1))$, and the Jacobian is **block-triangular**, so $\log|\det\mathbf{J}|=\sum_is_i(x_1)$. The code verifies on a 4-D coupling layer: formula $-0.334261$, autograd Jacobian $-0.334261$, inverse error $0$, and the off-diagonal block is zero. Stacks of couplings with alternating splits and permutations give expressive flows.
 
 **Biology-relevant flows.** *Boltzmann generators* (Noé et al., 2019) use flows to sample equilibrium conformations of molecules by training the flow to match the Boltzmann distribution $e^{-E(x)/k_BT}$ and reweighting, a route to equilibrium ensembles without long molecular dynamics (Chapter 52). *Flows on tori and $SE(3)$* parameterize protein backbone torsions or rigid frames (FoldFlow-type models; Chapter 36). Flows for *discrete* data (sequences) need *dequantization* or discrete flows, which have been less successful than autoregressive or diffusion models.
@@ -131,6 +135,7 @@ $s$ and $t$ are arbitrary neural networks of $x_1$, **never inverted**. The inve
 ## 14.5 Generative adversarial networks
 
 A **GAN** (Goodfellow et al., 2014) trains a generator $G:z\mapsto x$ and a discriminator $D(x)\in(0,1)$ in a minimax game:
+
 $$
 \min_G\max_D\ V(D,G)=\E_{x\sim p_\text{data}}[\log D(x)]+\E_{z\sim p(z)}[\log(1-D(G(z)))].
 $$
@@ -138,9 +143,11 @@ $$
 **Optimal discriminator.** For fixed $G$ with generated density $p_g$, maximize pointwise: $\max_D\,p_\text{data}\log D+p_g\log(1-D)$ gives $D^\star(x)=\dfrac{p_\text{data}(x)}{p_\text{data}(x)+p_g(x)}$.
 
 **Generator objective.** Substituting $D^\star$,
+
 $$
 V(D^\star,G)=\E_{p_\text{data}}\log\frac{p_\text{data}}{p_\text{data}+p_g}+\E_{p_g}\log\frac{p_g}{p_\text{data}+p_g}=2\,\mathrm{JS}(p_\text{data}\,\|\,p_g)-\log4,
 $$
+
 with $\mathrm{JS}(p\|q)=\tfrac12\KL{p}{m}+\tfrac12\KL{q}{m}$, $m=\tfrac12(p+q)$. A global minimum is reached iff $p_g=p_\text{data}$, with value $-\log4$. The code verifies numerically for $p=\Normal(0,1)$, $q=\Normal(1,1)$: $V(D^\star)=-1.16345=2\,\mathrm{JS}-\log4$.
 
 **Failure modes.** *Mode collapse*: the generator covers a few modes the discriminator finds hard to reject (the JS divergence saturates when supports barely overlap, giving vanishing gradients; Arjovsky & Bottou, 2017). *Instability* from the two-player dynamics. **Wasserstein GANs** replace JS by the Earth Mover's distance with a Lipschitz-constrained critic, improving gradients. No likelihood is available. In biology, GANs generated functional enzyme variants (ProteinGAN; Repecka et al., 2021) and DNA with desired properties, but diffusion and autoregressive models have largely displaced them because of coverage and stability. [[S]]
@@ -152,9 +159,11 @@ with $\mathrm{JS}(p\|q)=\tfrac12\KL{p}{m}+\tfrac12\KL{q}{m}$, $m=\tfrac12(p+q)$.
 An **energy-based model** defines $p_\theta(x)=e^{-E_\theta(x)}/Z_\theta$ with $Z_\theta=\sum_xe^{-E_\theta(x)}$ (an integral for continuous $x$). Any function can serve as an energy, giving great flexibility, and *the normalizer $Z_\theta$ is intractable* in general. Examples: **Potts models** (Chapter 29: $E(x)=-\sum_ih_i(x_i)-\sum_{i<j}J_{ij}(x_i,x_j)$), **Boltzmann machines**, physical force fields, and Rosetta-style protein energy functions.
 
 **The gradient of the log-likelihood.**
+
 $$
 \nabla_\theta\log p_\theta(x)=-\nabla_\theta E_\theta(x)-\nabla_\theta\log Z_\theta=-\nabla_\theta E_\theta(x)+\E_{x'\sim p_\theta}\big[\nabla_\theta E_\theta(x')\big],
 $$
+
 since $\nabla_\theta\log Z_\theta=\frac1{Z_\theta}\sum_x\nabla_\theta e^{-E_\theta(x)}=-\E_{p_\theta}[\nabla_\theta E_\theta]$. The first term is a "positive phase" (lower the energy of data), the second a "negative phase" (raise the energy of the model's own samples), and the expectation requires **MCMC sampling** from the current model (Langevin dynamics, Gibbs sampling) or approximations (contrastive divergence; Hinton, 2002). The code verifies the identity on an 8-state model by finite differences (error $2\times10^{-10}$).
 
 **Why EBMs matter for this book.**

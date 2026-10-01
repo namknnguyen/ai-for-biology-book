@@ -43,9 +43,11 @@ $$
 ### 10.2.2 Equivariance and locality
 
 Let $(S_\tau\mathbf{x})_{c,t}=x_{c,t-\tau}$ denote a shift by $\tau$. Away from the boundaries,
+
 $$
 \mathrm{conv}(S_\tau\mathbf{x})=S_\tau\,\mathrm{conv}(\mathbf{x}),
 $$
+
 since the same filter is applied at every position. *Proof.* $y'_{c',t}=b+\sum_{c,j}w_{c',c,j}x_{c,t+j-\tau}=y_{c',t-\tau}$. $\square$ Convolution is **translation-equivariant** (shifting the input shifts the output); *invariance* (output unchanged by a shift) is obtained by a subsequent pooling over positions. **Locality**: each output depends only on $k$ consecutive inputs.
 
 ### 10.2.3 Backpropagation through a convolution
@@ -69,9 +71,11 @@ The filter gradient is a *cross-correlation of the error signal with the input*:
 ## 10.3 Receptive fields: how far can the model see?
 
 The **receptive field** of a unit is the set of input positions that can influence it. For a stack of layers with kernel $k_\ell$ and dilation $d_\ell$ (stride 1), the receptive field of the final layer is
+
 $$
 r=1+\sum_\ell(k_\ell-1)\,d_\ell .
 $$
+
 Pooling or striding by factor $s_\ell$ multiplies the "jump" between adjacent units, so later layers' kernels cover more input: with pooling by 2 after each of $n$ layers of kernel 3, the receptive field roughly doubles per layer. **Dilated convolutions** insert gaps ($d>1$) and, with dilations $1,2,4,\dots,2^{n-1}$ and $k=3$, give $r=2^{n+1}-1$: exponential growth with depth at constant parameters per layer. A 10-layer stack reaches 2,047 positions; Basenji's dilated residual tower reaches into the tens of kilobases.
 
 **Theoretical versus effective receptive field.** The set of positions that *can* influence a unit is larger than the set that *effectively* does. The influence of input position $s$ on a unit is a sum over paths, which for stacked convolutions with positive weights resembles a repeated convolution: its profile tends to a Gaussian whose width grows only like $\sqrt{\text{depth}}$ (Luo et al., 2016) [[S]]. So a model with a theoretical receptive field of 100 kb may have an effective one much smaller. Residual connections and attention layers change this picture.

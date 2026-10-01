@@ -1,0 +1,16 @@
+# Build configuration for the single-page print version (used to make the PDF).
+# Usage: python tools/build_pdf.py   (see that script for the full pipeline)
+INHERIT: mkdocs.yml
+site_dir: site-pdf
+plugins:
+  - search
+  - print-site:
+      add_to_navigation: false
+      print_page_title: "AI for Biology: From First Principles to the Research Frontier"
+      add_print_site_banner: false
+      add_table_of_contents: true
+      toc_title: "Contents"
+      add_full_urls: false
+      enumerate_headings: false
+      enumerate_figures: false
+      path_to_pdf: ""
